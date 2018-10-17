@@ -33,7 +33,7 @@ def random_force(base_forces, n):
     n: number of random forces to generate. 
     """
     out_vec = []
-    rand_vals = lhsmdu.sample(len(base_forces)*2, n).tolist()
+    rand_vals = lhsmdu.sample(len(base_forces)*2, n, randomSeed=random.randint(0,2**32-1)).tolist()
     lhs_exp = make_lhs_expander(0,90000)
     for i in range(n):
         out_vec.append([])

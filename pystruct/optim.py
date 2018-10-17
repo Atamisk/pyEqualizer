@@ -11,6 +11,7 @@ from pystruct.fileops import *
 from copy import deepcopy
 from numpy import array
 import random
+import lhsmdu
 
 class Ind(object):
     def __init__(self, props, sys_num):
@@ -209,10 +210,12 @@ class system (object):
         TODO: Implement latin hypercube sampling
         """
         props = []
+        lhs_exp = make_lhs_expander(0,250)
+        lhs_vals = lhsmdu.sample(len(self.base_props),self.n_org,randomSeed=random.randint(0,2**32-1)).tolist()
         for x in range(self.n_org):
             org = self.base_props
             for i in range(len(org)):
-                org[i][3] = "{:.3f}".format(random.uniform(1,250))
+                org[i][3] = "{:.3f}".format(lhs_exp(lhs_vals[i][x]))
             props.append(org)
         return props
 
