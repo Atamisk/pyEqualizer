@@ -35,6 +35,11 @@ class Ind(object):
         out = out + "\n\n"
         return str(out)
 
+def make_lhs_expander(low_limit, high_limit):
+    """
+    Build a function to convert a (0,1) range into an arbitrary space
+    """
+    return lambda x: low_limit + x * (high_limit - low_limit)
 
 def get_plot_pts(vec):
     cost= [a.fitness for a in vec]

@@ -6,6 +6,7 @@ import sys, getopt
 import random 
 from time import time
 import argparse
+import lhsmdu
 
 
 def cost_stress(files):
@@ -32,12 +33,16 @@ def random_force(base_forces, n):
     n: number of random forces to generate. 
     """
     out_vec = []
+    rand_vals = lhsmdu.sample(len(base_forces)*2, n).tolist()
+    lhs_exp = make_lhs_expander(0,90000)
     for i in range(n):
         out_vec.append([])
         for j in range(len(base_forces)):
             out_vec[i].append(deepcopy(base_forces[j]))
             for k in range(5,7):
-                out_vec[i][j][k] = to_nas_real(random.uniform(0,90000))
+                val = rand_vals[2*j + k-5][i]
+                print(val)
+                out_vec[i][j][k] = to_nas_real(lhs_exp(val))
     return out_vec
 
 def plot_inds(ax, inds, lab):
