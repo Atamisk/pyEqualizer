@@ -217,7 +217,7 @@ def max_cquad_stress(f06_fname):
             return max_stress
         except:
             pass
-    raise(IOError(f06_name))
+    raise(IOError("File not found {}".format(f06_name)))
 
 def mass(f06_name):
     """
@@ -233,7 +233,7 @@ def mass(f06_name):
                         return float(valstr.replace('D', 'E'))
         except:
             pass
-    raise(IOError(f06_name))
+    raise(IOError("File not found {}".format(f06_name)))
 
 if __name__ == "__main__":
     fname = "/home/atamisk/current_semester/models/test.dat"

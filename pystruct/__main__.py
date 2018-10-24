@@ -34,7 +34,7 @@ def random_force(base_forces, n):
     """
     out_vec = []
     rand_vals = lhsmdu.sample(len(base_forces)*2, n, randomSeed=random.randint(0,2**32-1)).tolist()
-    lhs_exp = make_lhs_expander(0,90000)
+    lhs_exp = make_lhs_expander(0,104000)
     for i in range(n):
         out_vec.append([])
         for j in range(len(base_forces)):
@@ -102,7 +102,7 @@ try:
     parser.add_argument('--n_ind', '-i', type=int, default=15, help='Number of Simulation Individuals') 
     parser.add_argument('--n_sys', '-s', type=int, default=5, help='Number of Simulation Systems')
     parser.add_argument('--max_wt', '-w', type=int, default=1000, help='Maximum Weight Desired' )
-    parser.add_argument('--max_stress', '-t', type=int, default=100, help='Maximum Stress Desired')
+    parser.add_argument('--max_stress', '-t', type=int, default=80, help='Maximum Stress Desired')
     parser.add_argument('fname') 
     args = parser.parse_args()
     N_GEN = args.n_gen           # Number of generations per system. 
