@@ -58,6 +58,7 @@ def normal_random_force(base_forces, n, mu_force, sigma_force, mu_angle, sigma_a
             force_horiz = force * math.sin(angle)
             rand_vals[0].append(deepcopy(force_horiz))
             rand_vals[1].append(deepcopy(force_vert))
+        return random_force_base(base_forces, rand_vals, n)
 
             
 
