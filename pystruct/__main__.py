@@ -1,3 +1,3 @@
-
+import pystruct
 # Actual code to run...
-main()
+pystruct.main()
