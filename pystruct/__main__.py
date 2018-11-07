@@ -25,8 +25,43 @@ def cost_mass(files):
     return [mass(f+".out") for f in files]
 
 def uniform_random_force(base_forces, n):
-    rand_vals = lhsmdu.sample(len(base_forces)*2, n, randomSeed=random.randint(0,2**32-1)).tolist()
+    pre = lhsmdu.sample(len(base_forces)*2, n, randomSeed=random.randint(0,2**32-1)).tolist()
+    lhs_exp = make_linear_map(0,104000)
+    rand_vals = []
+    for i in range(len(pre)):
+        p = []
+        for j in range(len(pre[i])):
+            p.append(lhs_exp(pre[i][j]))
+        rand_vals.append(p)
+
+    print("SIZE")
+    print(len(rand_vals))
+    print(len(rand_vals[0]))
+    print("\n\n\n\n")
     return random_force_base(base_forces, rand_vals, n)
+
+def normal_random_force(base_forces, n, mu_force, sigma_force, mu_angle, sigma_angle):
+    if (n % 2 != 0):
+        raise ValueError("n must be divisible by 2")
+    else: 
+        rand_vals_uniform = lhsmdu.sample(len(base_forces)*2, n, randomSeed=random.randint(0,2**32-1)).tolist()
+        tonorm_force = make_normal_map(mu_force, sigma_force)
+        tonorm_angle = make_normal_map(mu_angle, sigma_angle)
+        rand_vals = [ [], [] ]
+        for index in range(n):
+            rvu_force = random_values_uniform[0]
+            rvu_angle = random_values_uniform[1]
+            other_index = random.randint(0,len(rand_vals_uniform)-1)
+            force = tonorm_force(rvu_force[index], rvu_force[other_index])[0]
+            angle = tonorm_angle(rvu_angle[index], rvu_angle[other_index])[0]
+            force_vert = force * math.cos(angle)
+            force_horiz = force * math.sin(angle)
+            rand_vals[0].append(deepcopy(force_horiz))
+            rand_vals[1].append(deepcopy(force_vert))
+
+            
+
+
 
 def random_force_base(base_forces, rand_vals, n):
     """
@@ -37,7 +72,6 @@ def random_force_base(base_forces, rand_vals, n):
     n: number of random forces to generate. 
     """
     out_vec = []
-    lhs_exp = make_linear_map(0,104000)
     for i in range(n):
         out_vec.append([])
         for j in range(len(base_forces)):
@@ -45,7 +79,7 @@ def random_force_base(base_forces, rand_vals, n):
             for k in range(5,7):
                 val = rand_vals[2*j + k-5][i]
                 print(val)
-                out_vec[i][j][k] = to_nas_real(lhs_exp(val))
+                out_vec[i][j][k] = to_nas_real(val)
     return out_vec
 
 
@@ -78,7 +112,7 @@ def plot_with_front(gen, front, title, fname):
     fig.savefig(fname)
     return [fig, ax]
 
-def validate_inds(inds, val_force):
+def validate_inds(inds, val_force, fname):
     val_sys = system(99,fname,1,0,[cost_mass, cost_stress],force = val_force)
     val_inds = val_sys.dummy_generation(inds)
     valid_designs = []
@@ -171,7 +205,7 @@ def gen_case(args):
             all_front_mixed.append(y)
 
     #Validate all optimal designs against the maximum load 
-    valid_designs = validate_inds(all_front_mixed, starting_force)
+    valid_designs = validate_inds(all_front_mixed, starting_force, fname)
 
     #Plot regression line
     fig, ax = subplots()
