@@ -60,10 +60,6 @@ def normal_random_force(base_forces, n, mu_force, sigma_force, mu_angle, sigma_a
             rand_vals[1].append(deepcopy(force_vert))
         return random_force_base(base_forces, rand_vals, n)
 
-            
-
-
-
 def random_force_base(base_forces, rand_vals, n):
     """
     random_force(base_forces, n): make an array of random force properties. 
@@ -113,12 +109,12 @@ def plot_with_front(gen, front, title, fname):
     fig.savefig(fname)
     return [fig, ax]
 
-def validate_inds(inds, val_force, fname):
+def validate_inds(inds, val_force, fname, max_wt, max_stress):
     val_sys = system(99,fname,1,0,[cost_mass, cost_stress],force = val_force)
     val_inds = val_sys.dummy_generation(inds)
     valid_designs = []
     for x in range(len(val_inds)):
-        if val_inds[x].fitness[0] < MAX_WT and val_inds[x].fitness[1] < MAX_STRESS:
+        if val_inds[x].fitness[0] < max_wt and val_inds[x].fitness[1] < max_stress:
             valid_designs.append(inds[x])
     return valid_designs
 
@@ -154,21 +150,20 @@ def parseargs():
     except:
         raise()
 
-def gen_case(args):
+def gen_case(args, force_func):
     N_GEN = args.n_gen           # Number of generations per system. 
     N_IND = args.n_ind           # Number of individuals per system. 
     N_SYS = args.n_sys           # Number of systems. 
     MAX_WT = args.max_wt         # Max Weight
     MAX_STRESS = args.max_stress # Max Stress
     fname = args.fname
-    #prefix = sys.argv[2]
     start_time = time()
 
     # Pull force parameters to randomize
     file_lines = load_from_file(fname)
     starting_force = read_force(file_lines)
     #Generate random forces
-    force_packs = uniform_random_force(starting_force, N_SYS)
+    force_packs = force_func(starting_force, N_SYS)
     all_front = []
 
     #For each random force generated...
@@ -206,7 +201,7 @@ def gen_case(args):
             all_front_mixed.append(y)
 
     #Validate all optimal designs against the maximum load 
-    valid_designs = validate_inds(all_front_mixed, starting_force, fname)
+    valid_designs = validate_inds(all_front_mixed, starting_force, fname, MAX_WT, MAX_STRESS)
 
     #Plot regression line
     fig, ax = subplots()
@@ -262,12 +257,23 @@ def gen_case(args):
     #for x in final_front:
     #    print(x)
 
+def det_run(args):
+    print("STUB: Deterministic Run")
+
+def dwu_run(args):
+    print("STUB: DWU Run")
+
 def main():
     args = parseargs()
     if args.special:
-        print("STUB: I'd handle special cases here")
+        cases = {
+                1: det_run,
+                2: dwu_run
+                }
+        cases[args.special](args)
     else:
-        gen_case(args)
+        gen_case(args, uniform_random_force)
+
 
 
 # Actual code to run...
