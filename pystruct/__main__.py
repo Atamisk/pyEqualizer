@@ -25,6 +25,10 @@ def cost_mass(files):
     return [mass(f+".out") for f in files]
 
 def uniform_random_force(base_forces, n):
+    rand_vals = lhsmdu.sample(len(base_forces)*2, n, randomSeed=random.randint(0,2**32-1)).tolist()
+    return random_force_base(base_forces, rand_vals, n)
+
+def random_force_base(base_forces, rand_vals, n):
     """
     random_force(base_forces, n): make an array of random force properties. 
 
@@ -33,8 +37,7 @@ def uniform_random_force(base_forces, n):
     n: number of random forces to generate. 
     """
     out_vec = []
-    rand_vals = lhsmdu.sample(len(base_forces)*2, n, randomSeed=random.randint(0,2**32-1)).tolist()
-    lhs_exp = make_lhs_expander(0,104000)
+    lhs_exp = make_linear_map(0,104000)
     for i in range(n):
         out_vec.append([])
         for j in range(len(base_forces)):
@@ -44,6 +47,7 @@ def uniform_random_force(base_forces, n):
                 print(val)
                 out_vec[i][j][k] = to_nas_real(lhs_exp(val))
     return out_vec
+
 
 def plot_inds(ax, inds, lab):
     """

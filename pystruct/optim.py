@@ -36,7 +36,7 @@ class Ind(object):
         out = out + "\n\n"
         return str(out)
 
-def make_lhs_expander(low_limit, high_limit):
+def make_linear_map(low_limit, high_limit):
     """
     Build a function to convert a (0,1) range into an arbitrary space
     """
@@ -210,7 +210,7 @@ class system (object):
         TODO: Implement latin hypercube sampling
         """
         props = []
-        lhs_exp = make_lhs_expander(0,250)
+        lhs_exp = make_linear_map(0,250)
         lhs_vals = lhsmdu.sample(len(self.base_props),self.n_org,randomSeed=random.randint(0,2**32-1)).tolist()
         for x in range(self.n_org):
             org = self.base_props
