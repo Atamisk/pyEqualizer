@@ -24,7 +24,7 @@ def cost_mass(files):
     """
     return [mass(f+".out") for f in files]
 
-def random_force(base_forces, n):
+def uniform_random_force(base_forces, n):
     """
     random_force(base_forces, n): make an array of random force properties. 
 
@@ -129,7 +129,7 @@ def gen_case(args):
     file_lines = load_from_file(fname)
     starting_force = read_force(file_lines)
     #Generate random forces
-    force_packs = random_force(starting_force, N_SYS)
+    force_packs = uniform_random_force(starting_force, N_SYS)
     all_front = []
 
     #For each random force generated...
