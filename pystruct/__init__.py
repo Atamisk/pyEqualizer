@@ -6,7 +6,7 @@ import sys, getopt
 import random 
 from time import time
 import argparse
-import lhsmdu
+import msslhs
 
 
 def cost_stress(files):
@@ -25,7 +25,7 @@ def cost_mass(files):
     return [mass(f+".out") for f in files]
 
 def uniform_random_force(base_forces, n):
-    pre = lhsmdu.sample(len(base_forces)*2, n, randomSeed=random.randint(0,2**32-1)).tolist()
+    pre = msslhs.sample(len(base_forces)*2, n, 1)[0].transpose().tolist()
     lhs_exp = make_linear_map(0,104000)
     rand_vals = []
     for i in range(len(pre)):
@@ -40,18 +40,13 @@ def normal_random_force(base_forces, n, mu_force, sigma_force, mu_angle, sigma_a
     #    print("YOU IDIOT")
     #    raise ValueError("n must be divisible by 2")
     #else: 
-    rand_vals_uniform = lhsmdu.sample(len(base_forces)*2, n, randomSeed=random.randint(0,2**32-1)).tolist()
-    tonorm_force = make_normal_map(mu_force, sigma_force)
-    tonorm_angle = make_normal_map(mu_angle, sigma_angle)
-    rand_vals = [ [], [] ]
+    rand_vals_norm = msslhs.sample(len(base_forces)*2, n, 1)[1].transpose().tolist()
     force_list = []
     angle_list = []
+    rand_vals = [ [], [] ]
     for index in range(n):
-        rvu_force = rand_vals_uniform[0]
-        rvu_angle = rand_vals_uniform[1]
-        other_index = random.randint(0,len(rand_vals_uniform)-1)
-        force = tonorm_force(rvu_force[index], rvu_force[other_index])[1]
-        angle = tonorm_angle(rvu_angle[index], rvu_angle[other_index])[1]
+        force = rand_vals_norm[0][index]
+        angle = rand_vals_norm[1][index]
         force_vert = force * math.cos(angle)
         force_horiz = force * math.sin(angle)
         rand_vals[0].append(deepcopy(force_horiz))
