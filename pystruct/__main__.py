@@ -96,15 +96,26 @@ def print_ind(ind):
     print("Web Thickness:\t\t\t{}".format(ind.props[2][3]))
     print("Doubler Thickness at Hoist Pin:\t{}".format(ind.props[3][3]))
     print("Doubler Thickness at Load Pin:\t{}".format(ind.props[4][3]))
-try:
-    parser = argparse.ArgumentParser(description='Differentially optimize a better spreader beam')
-    parser.add_argument('--n_gen', '-g', type=int, default=5, help='Number of Simulation Generations')
-    parser.add_argument('--n_ind', '-i', type=int, default=15, help='Number of Simulation Individuals') 
-    parser.add_argument('--n_sys', '-s', type=int, default=5, help='Number of Simulation Systems')
-    parser.add_argument('--max_wt', '-w', type=int, default=1000, help='Maximum Weight Desired' )
-    parser.add_argument('--max_stress', '-t', type=int, default=80, help='Maximum Stress Desired')
-    parser.add_argument('fname') 
-    args = parser.parse_args()
+
+def parseargs():
+    """
+    Helper function to handle argument parsing
+    """
+    try:
+        parser = argparse.ArgumentParser(description='Differentially optimize a better spreader beam')
+        parser.add_argument('--n_gen', '-g', type=int, default=5, help='Number of Simulation Generations')
+        parser.add_argument('--n_ind', '-i', type=int, default=15, help='Number of Simulation Individuals') 
+        parser.add_argument('--n_sys', '-s', type=int, default=5, help='Number of Simulation Systems')
+        parser.add_argument('--max_wt', '-w', type=int, default=1000, help='Maximum Weight Desired' )
+        parser.add_argument('--max_stress', '-t', type=int, default=95.3, help='Maximum Stress Desired')
+        parser.add_argument('--special' ,'-S' ,help='Perform special case NUM', type=int)
+        parser.add_argument('fname') 
+        args = parser.parse_args()
+        return args
+    except:
+        raise()
+
+def gen_case(args):
     N_GEN = args.n_gen           # Number of generations per system. 
     N_IND = args.n_ind           # Number of individuals per system. 
     N_SYS = args.n_sys           # Number of systems. 
@@ -212,7 +223,13 @@ try:
     #for x in final_front:
     #    print(x)
 
+def main():
+    args = parseargs()
+    if args.special:
+        print("STUB: I'd handle special cases here")
+    else:
+        gen_case(args)
 
 
-except:
-    raise
+# Actual code to run...
+main()
