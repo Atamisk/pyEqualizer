@@ -28,7 +28,11 @@ class cd:
         os.chdir(self.savedPath)
 
 def to_nas_real(number):
-    exponent = floor(log(number,10))
+    try:
+        exponent = floor(log(number,10))
+    except ValueError as e: 
+        #We probably passed zero into the function. Assume exponent is 1. 
+        exponent = 1
     a = "{:6f}".format(number/(10**exponent))[0:6]
     return "{}{:+}".format(a,exponent)
 

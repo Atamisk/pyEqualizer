@@ -33,11 +33,6 @@ def uniform_random_force(base_forces, n):
         for j in range(len(pre[i])):
             p.append(lhs_exp(pre[i][j]))
         rand_vals.append(p)
-
-    print("SIZE")
-    print(len(rand_vals))
-    print(len(rand_vals[0]))
-    print("\n\n\n\n")
     return random_force_base(base_forces, rand_vals, n)
 
 def normal_random_force(base_forces, n, mu_force, sigma_force, mu_angle, sigma_angle):
@@ -49,19 +44,25 @@ def normal_random_force(base_forces, n, mu_force, sigma_force, mu_angle, sigma_a
     tonorm_force = make_normal_map(mu_force, sigma_force)
     tonorm_angle = make_normal_map(mu_angle, sigma_angle)
     rand_vals = [ [], [] ]
+    force_list = []
+    angle_list = []
     for index in range(n):
         rvu_force = rand_vals_uniform[0]
         rvu_angle = rand_vals_uniform[1]
         other_index = random.randint(0,len(rand_vals_uniform)-1)
-        force = tonorm_force(rvu_force[index], rvu_force[other_index])[0]
-        angle = tonorm_angle(rvu_angle[index], rvu_angle[other_index])[0]
+        force = tonorm_force(rvu_force[index], rvu_force[other_index])[1]
+        angle = tonorm_angle(rvu_angle[index], rvu_angle[other_index])[1]
         force_vert = force * math.cos(angle)
         force_horiz = force * math.sin(angle)
         rand_vals[0].append(deepcopy(force_horiz))
         rand_vals[1].append(deepcopy(force_vert))
-    print("RAND_VALS")
-    print(rand_vals)
-    print()
+
+        force_list.append(force)
+        angle_list.append(angle)
+
+    fig, ax = subplots()
+    ax.hist(force_list)
+    fig.savefig('/tmp/derp.png')
     return random_force_base(base_forces, rand_vals, n)
 
 def random_force_base(base_forces, rand_vals, n):
@@ -79,7 +80,6 @@ def random_force_base(base_forces, rand_vals, n):
             out_vec[i].append(deepcopy(base_forces[j]))
             for k in range(5,7):
                 val = rand_vals[2*j + k-5][i]
-                print(val)
                 out_vec[i][j][k] = to_nas_real(val)
     return out_vec
 
@@ -166,12 +166,12 @@ def gen_case(args, force_func):
     # Pull force parameters to randomize
     file_lines = load_from_file(fname)
     starting_force = read_force(file_lines)
+    all_front = []
     #Generate random forces
     force_packs = force_func(starting_force, N_SYS)
     print("FORCE PACKS")
     print(force_packs)
     print()
-    all_front = []
 
     #For each random force generated...
     for x in range(len(force_packs)):
