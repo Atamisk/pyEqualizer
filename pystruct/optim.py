@@ -45,16 +45,10 @@ def make_linear_map(low_limit, high_limit):
 
 def make_normal_map(mu, sigma):
     """
-    Build a function to convert a [0,1] range into a normal
+    Build a function to convert a Z value into a normal
     distribution with the spefified characteristics.
     """
-    def box_muller(u1, u2):
-        Z0 = math.sqrt(-2*math.log(u1))*math.cos(2*math.pi*u2)
-        Z1 = math.sqrt(-2*math.log(u1))*math.sin(2*math.pi*u2)
-        r0 = mu + sigma*Z0
-        r1 = mu + sigma*Z1
-        return [r0, r1]
-    return lambda x, y: box_muller(x,y)
+    return lambda x: mu + (sigma * x)
 
 
 def get_plot_pts(vec):

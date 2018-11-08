@@ -41,24 +41,21 @@ def normal_random_force(base_forces, n, mu_force, sigma_force, mu_angle, sigma_a
     #    raise ValueError("n must be divisible by 2")
     #else: 
     rand_vals_norm = msslhs.sample(len(base_forces)*2, n, 1)[1].transpose().tolist()
-    force_list = []
-    angle_list = []
-    rand_vals = [ [], [] ]
-    for index in range(n):
-        force = rand_vals_norm[0][index]
-        angle = rand_vals_norm[1][index]
-        force_vert = force * math.cos(angle)
-        force_horiz = force * math.sin(angle)
-        rand_vals[0].append(deepcopy(force_horiz))
-        rand_vals[1].append(deepcopy(force_vert))
+    conv_force = make_normal_map(mu_force, sigma_force)
+    conv_angle = make_normal_map(mu_angle, sigma_angle)
+    rand_vals_out = [ [], [] ]
+    for x in range(len(rand_vals_norm[0])):
+        if conv_force(rand_vals_norm[0][x]) > 190514:
+            vals = rnd_to_actual(conv_force(rand_vals_norm[0][x]), conv_angle(rand_vals_norm[1][x]))
+            rand_vals_out[0].append(vals[0])
+            rand_vals_out[1].append(vals[1])
+    print("Of {} generated systems, {} meet the minimum force criterion.".format(n, len(rand_vals_out[0])))
+    return random_force_base(base_forces, rand_vals_out, n)
 
-        force_list.append(force)
-        angle_list.append(angle)
-
-    fig, ax = subplots()
-    ax.hist(force_list)
-    fig.savefig('/tmp/derp.png')
-    return random_force_base(base_forces, rand_vals, n)
+def rnd_to_actual(force, angle):
+    force_vert = force * math.cos(angle)
+    force_horiz = force * math.sin(angle)
+    return [force_vert, force_horiz]
 
 def random_force_base(base_forces, rand_vals, n):
     """
@@ -69,7 +66,7 @@ def random_force_base(base_forces, rand_vals, n):
     n: number of random forces to generate. 
     """
     out_vec = []
-    for i in range(n):
+    for i in range(len(rand_vals[0])):
         out_vec.append([])
         for j in range(len(base_forces)):
             out_vec[i].append(deepcopy(base_forces[j]))
@@ -263,8 +260,10 @@ def det_run(args):
     print("STUB: Deterministic Run")
 
 def dwu_run(args):
+    args_out = deepcopy(args)
+    #args_out.n_sys = 1000
     nrf_closed = lambda x,y: normal_random_force(x, y, 150000, 20670, 0, 0.087) #Fix angle and force parameters per our e-mail. 
-    gen_case(args, nrf_closed)
+    gen_case(args_out, nrf_closed)
 def main():
     args = parseargs()
     if args.special:
