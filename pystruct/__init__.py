@@ -198,21 +198,6 @@ def gen_case(args, force_func):
     #Validate all optimal designs against the maximum load 
     valid_designs = validate_inds(all_front_mixed, starting_force, fname, MAX_WT, MAX_STRESS)
 
-    #Plot regression line
-    fig, ax = subplots()
-    try:
-        mean_line = find_line(all_front_mixed)
-        af_x, _ = get_plot_pts(all_front_mixed)
-        min_x = min(af_x)
-        max_x = max(af_x)
-        ml_x = linspace(min_x, max_x, 40)
-        ml_y = [mean_line(x) for x in ml_x]
-        ax.plot(ml_x, ml_y, 'y-', label='Regression Line')
-    except Exception as e:
-        print("No regression line printed...")
-        print(e)
-        raise(e)
-
     #Generate final selected designs from all paretos. 
     final_front = isolate_pareto(valid_designs)
     
@@ -226,7 +211,6 @@ def gen_case(args, force_func):
     #Plot final selected designs.
     ff_x, ff_y = get_plot_pts(final_front)
     ax.scatter(ff_x, ff_y, label='Pareto Front')
-    
 
     #Plot axis labels
     ax.legend()
