@@ -36,10 +36,6 @@ def uniform_random_force(base_forces, n):
     return random_force_base(base_forces, rand_vals, n)
 
 def normal_random_force(base_forces, n, mu_force, sigma_force, mu_angle, sigma_angle):
-    #if (n % 2 != 0):
-    #    print("YOU IDIOT")
-    #    raise ValueError("n must be divisible by 2")
-    #else: 
     rand_vals_norm = msslhs.sample(len(base_forces)*2, n, 1)[1].transpose().tolist()
     conv_force = make_normal_map(mu_force, sigma_force)
     conv_angle = make_normal_map(mu_angle, sigma_angle)
@@ -246,15 +242,6 @@ def gen_case(args, force_func):
     for x in range(len(final_front)):
         print("\nSystem {}".format(x))
         print_ind(final_front[x])
-    #print("System force magnitudes:")
-    #for x in range(len(force_packs)):
-    #    print("System {}: {:.2e}".format(x, sum([from_nas_real(force_packs[x][0][a])**2 for a in range(5,7)])**0.5))
-    #print("System force magnitudes(vertical only)")
-    #for x in range(len(force_packs)):
-    #    print("System {}: {:.2e}".format(x,from_nas_real(force_packs[x][0][6])))
-    #print("Pareto front by parent system:")
-    #for x in final_front:
-    #    print(x)
 
 def det_run(args):
     print("STUB: Deterministic Run")
