@@ -331,7 +331,6 @@ class system (object):
 
     def trial_generation(self, last_vec):
         #isolate the property vector from last generation
-        #print(last_vec)
         last_props = [deepcopy(a.props) for a in last_vec]
         #run the crossover function to obtain trial vector with fitnesses. 
         trial_vec_basic = self.run_generation(self.crossover, last_props)
