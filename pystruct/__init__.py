@@ -33,7 +33,7 @@ def const_beta(files):
         sigma_strength = 32.5
         return (mu_strength - stress) / ((sigma_strength) ** 2 + (0)**2)**0.5
     stresses = cost_stress(files)
-    betas = [beta(st) for st in stresses]
+    betas = [min(beta(st)-4, 0)*-10**4 for st in stresses]
     print(betas)
     return betas
 

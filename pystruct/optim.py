@@ -298,11 +298,20 @@ class system (object):
         Generate the standard fitness vector from a series of properties.
         """
         fitness = [[] for a in props]
+        fitness_constr = deepcopy(fitness)
+        fitness_mults = [1 for a in props]
         for fn in self.fitness_funcs:
             res = fn(files)
             for x in range(len(files)):
                 fitness[x].append(res[x])
-        return fitness
+        for fn in self.const_funcs:
+            res = fn(files)
+            for x in range(len(fitness)):
+                fitness_mults[x] += res[x]
+        for x in range(len(fitness)):
+            fitness_constr[x] = [ a * fitness_mults[x] for a in fitness[x] ]
+        print(fitness_constr)
+        return fitness_constr
 
 
     def run_generation(self, prop_func, last_props):
