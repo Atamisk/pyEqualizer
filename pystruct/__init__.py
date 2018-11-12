@@ -37,6 +37,12 @@ def const_beta(files):
     print(betas)
     return betas
 
+def const_mass(files):
+    masses = cost_mass(files)
+    ms_out = [min(1000 - x, 0) * -10**4 for x in masses]
+    print(ms_out)
+    return(ms_out)
+
 def uniform_random_force(base_forces, n):
     pre = msslhs.sample(len(base_forces)*2, n, 1)[0].transpose().tolist()
     lhs_exp = make_linear_map(0,104000)
@@ -176,7 +182,8 @@ def gen_case(args, force_func):
 
     #For each random force generated...
     for x in range(len(force_packs)):
-        main_sys = system(x,fname, 1,N_IND, [cost_mass, cost_stress], [const_beta], force = force_packs[x])
+        main_sys = system(x,fname, 1,N_IND, [cost_mass, cost_stress], 
+                          [const_beta, const_mass], force = force_packs[x])
         latest_vec = main_sys.first_generation()
         
         for i in range(N_GEN):
