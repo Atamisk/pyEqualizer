@@ -137,7 +137,7 @@ class system (object):
     CR = 0.45
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
-            fitness_funcs, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
+            fitness_funcs, const_funcs, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
         """ 
         Initialize the system class.
         
@@ -162,6 +162,7 @@ class system (object):
         self.__prefix = prefix
         self.__binary = binary
         self.fitness_funcs = fitness_funcs
+        self.const_funcs = const_funcs
 
         if force == []:
             self.__base_force = read_force(self.__lines)

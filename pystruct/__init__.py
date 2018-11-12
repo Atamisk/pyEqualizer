@@ -24,6 +24,19 @@ def cost_mass(files):
     """
     return [mass(f+".out") for f in files]
 
+def const_beta(files):
+    """
+    Categorize organisms by reliability index. 
+    """
+    def beta(stress):
+        mu_strength = 250
+        sigma_strength = 32.5
+        return (mu_strength - stress) / ((sigma_strength) ** 2 + (0)**2)**0.5
+    stresses = cost_stress(files)
+    betas = [beta(st) for st in stresses]
+    print(betas)
+    return betas
+
 def uniform_random_force(base_forces, n):
     pre = msslhs.sample(len(base_forces)*2, n, 1)[0].transpose().tolist()
     lhs_exp = make_linear_map(0,104000)
@@ -102,7 +115,7 @@ def plot_with_front(gen, front, title, fname):
     return [fig, ax]
 
 def validate_inds(inds, val_force, fname, max_wt, max_stress):
-    val_sys = system(99,fname,1,0,[cost_mass, cost_stress],force = val_force)
+    val_sys = system(99,fname,1,0,[cost_mass, cost_stress], [const_beta], force = val_force)
     val_inds = val_sys.dummy_generation(inds)
     valid_designs = []
     for x in range(len(val_inds)):
@@ -163,7 +176,7 @@ def gen_case(args, force_func):
 
     #For each random force generated...
     for x in range(len(force_packs)):
-        main_sys = system(x,fname, 1,N_IND, [cost_mass, cost_stress], force = force_packs[x])
+        main_sys = system(x,fname, 1,N_IND, [cost_mass, cost_stress], [const_beta], force = force_packs[x])
         latest_vec = main_sys.first_generation()
         
         for i in range(N_GEN):
@@ -257,7 +270,7 @@ def det_run(args):
 
 def dwu_run(args):
     args_out = deepcopy(args)
-    #args_out.n_sys = 1000
+    args_out.n_sys = 1000
     nrf_closed = lambda x,y: normal_random_force(x, y, 150000, 20670, 0, 0.087) #Fix angle and force parameters per our e-mail. 
     gen_case(args_out, nrf_closed)
 def main():
