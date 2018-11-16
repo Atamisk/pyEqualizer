@@ -220,8 +220,8 @@ def max_cquad_stress(f06_fname):
                             l = f.readline()
             return max_stress
         except:
-            pass
-    raise(IOError("File not found {}".format(f06_name)))
+            print("ERROR: {}".format(e))
+    return 1.0*10**10 # Return an absurdly high stress is the file isn't found or has failed.
 
 def mass(f06_name):
     """
@@ -235,9 +235,9 @@ def mass(f06_name):
                         l = f.readline()
                         valstr = l[41:56]
                         return float(valstr.replace('D', 'E'))
-        except:
-            pass
-    raise(IOError("File not found {}".format(f06_name)))
+        except Exception as e:
+            print("ERROR: {}".format(e))
+    return 1.0*10**10 # Return an absurdly high stress is the file isn't found or has failed.
 
 if __name__ == "__main__":
     fname = "/home/atamisk/current_semester/models/test.dat"
