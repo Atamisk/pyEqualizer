@@ -34,13 +34,11 @@ def const_beta(files):
         return (mu_strength - stress) / ((sigma_strength) ** 2 + (0)**2)**0.5
     stresses = cost_stress(files)
     betas = [min(beta(st)-4, 0)*-10**4 for st in stresses]
-    print(betas)
     return betas
 
 def const_mass(files):
     masses = cost_mass(files)
     ms_out = [min(1000 - x, 0) * -10**4 for x in masses]
-    print(ms_out)
     return(ms_out)
 
 def uniform_random_force(base_forces, n):
@@ -100,7 +98,6 @@ def plot_inds(ax, inds, lab):
     ax.set_xlabel('Weight(kg)');
     ax.set_ylabel('Stress(MPa)');
 
-
 def plot_with_front(gen, front, title, fname):
     """
     plot with front: Print the generation gen and front, 
@@ -136,12 +133,22 @@ def print_ind(ind):
     """
     Compactly print an individual.
     """
-    print("Design Spec:")
-    print("Top Flange Width:\t\t{}".format(ind.props[0][3]))
-    print("Bottom Flange Width:\t\t{}".format(ind.props[1][3]))
-    print("Web Thickness:\t\t\t{}".format(ind.props[2][3]))
-    print("Doubler Thickness at Hoist Pin:\t{}".format(ind.props[3][3]))
-    print("Doubler Thickness at Load Pin:\t{}".format(ind.props[4][3]))
+    print("  Parent Load Case:\t\t\t{}".format(ind.sys_num))
+    print("  Design Spec:")
+    print("    Top Flange Width:\t\t\t{:4.2e} mm".format(float(ind.props[0][3])))
+    print("    Bottom Flange Width:\t\t{:4.2e} mm".format(float(ind.props[1][3])))
+    print("    Web Thickness:\t\t\t{:4.2e} mm".format(float(ind.props[2][3])))
+    print("    Doubler Thickness at Hoist Pin:\t{:4.2e} mm".format(float(ind.props[3][3])))
+    print("    Doubler Thickness at Load Pin:\t{:4.2e} mm".format(float(ind.props[4][3])))
+    print("  Fitness:")
+    print("    Max Stress:\t\t\t\t{:4.2e} MPa".format(float(ind.fitness_unconst[1])))
+    print("    Weight:\t\t\t\t{:4.2e} kg".format(float(ind.fitness_unconst[0])))
+
+def print_load_case(lc,case_num):
+    print("Load Case {}".format(case_num))
+    print("  X Force:\t{:4.2e}".format(from_nas_real(lc[0][5])))
+    print("  Y Force:\t{:4.2e}".format(from_nas_real(lc[0][6])))
+
 
 def parseargs():
     """
@@ -176,9 +183,6 @@ def gen_case(args, force_func):
     all_front = []
     #Generate random forces
     force_packs = force_func(starting_force, N_SYS)
-    print("FORCE PACKS")
-    print(force_packs)
-    print()
 
     #For each random force generated...
     for x in range(len(force_packs)):
@@ -245,9 +249,14 @@ def gen_case(args, force_func):
 
     #Summary!
     print("Program Complete.")
-    print("Summary of valid designs:")
+    print("\nLoad Case Summary:")
+    print(  "----------------------")
+    for x in range(len(force_packs)):
+        print_load_case(force_packs[x],x)
+    print("\nSummary of valid designs:")
+    print(  "--------------------------")
     for x in range(len(final_front)):
-        print("\nSystem {}".format(x))
+        print("System {}".format(x))
         print_ind(final_front[x])
 
 def det_run(args):

@@ -27,6 +27,7 @@ class Ind(object):
     def from_array(cls, array, sys_num):
         obj = cls(array[0], sys_num)
         obj.fitness = array[1]
+        obj.fitness_unconst = array[2]
         return obj
 
     def __str__(self):
@@ -52,7 +53,7 @@ def make_normal_map(mu, sigma):
 
 
 def get_plot_pts(vec):
-    cost= [a.fitness for a in vec]
+    cost= [a.fitness_unconst for a in vec]
     return [array(a) for a in zip(*cost)]
 
 def compare_all(trial, chall, comp):
@@ -297,21 +298,20 @@ class system (object):
         """
         Generate the standard fitness vector from a series of properties.
         """
-        fitness = [[] for a in props]
-        fitness_constr = deepcopy(fitness)
+        fitness_unconst = [[] for a in props]
+        fitness = deepcopy(fitness_unconst)
         fitness_mults = [1 for a in props]
         for fn in self.fitness_funcs:
             res = fn(files)
             for x in range(len(files)):
-                fitness[x].append(res[x])
+                fitness_unconst[x].append(res[x])
         for fn in self.const_funcs:
             res = fn(files)
             for x in range(len(fitness)):
                 fitness_mults[x] += res[x]
         for x in range(len(fitness)):
-            fitness_constr[x] = [ a * fitness_mults[x] for a in fitness[x] ]
-        print(fitness_constr)
-        return fitness_constr
+            fitness[x] = [ a * fitness_mults[x] for a in fitness_unconst[x] ]
+        return [fitness, fitness_unconst]
 
 
     def run_generation(self, prop_func, last_props):
@@ -325,8 +325,8 @@ class system (object):
         props = prop_func(last_props)
         files = multi_file_out(fold_in_force(props, self.__base_force), self.base_lines, self.prefix)
         run_nastran(self.binary, files)
-        fitness = self.get_fitness_vector(props, files)
-        out = list(zip(props, fitness))
+        fitness, fitness_unconst = self.get_fitness_vector(props, files)
+        out = list(zip(props, fitness, fitness_unconst))
         return out
 
     def dummy_generation(self, last_vec):
