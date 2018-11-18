@@ -117,6 +117,13 @@ def plot_with_front(gen, front, title, fname):
     fig.savefig(fname)
     return [fig, ax]
 
+def no_validate(inds, val_force, fname, max_wt, max_stress):
+    """
+    Do not perform FEM validation. Used on solutions with more traditional constraints. 
+    """
+    print("NO_VAL")
+    return inds
+
 def validate_inds(inds, val_force, fname, max_wt, max_stress):
     val_sys = system(99,fname,1,0,[cost_mass, cost_stress], [const_beta], force = val_force)
     val_inds = val_sys.dummy_generation(inds)
@@ -168,7 +175,7 @@ def parseargs():
     except:
         raise()
 
-def gen_case(args, force_func):
+def gen_case(args, force_func, val_func):
     N_GEN = args.n_gen           # Number of generations per system. 
     N_IND = args.n_ind           # Number of individuals per system. 
     N_SYS = args.n_sys           # Number of systems. 
@@ -223,7 +230,7 @@ def gen_case(args, force_func):
     fig, ax = subplots()
 
     #Validate all optimal designs against the maximum load 
-    valid_designs = validate_inds(all_front_mixed, starting_force, fname, MAX_WT, MAX_STRESS)
+    valid_designs = val_func(all_front_mixed, starting_force, fname, MAX_WT, MAX_STRESS)
 
     #Generate final selected designs from all paretos. 
     final_front = isolate_pareto(valid_designs)
@@ -279,16 +286,17 @@ def det_run(args):
         """
         dum_vals = [[0],[-150000]]
         return random_force_base(sf, dum_vals, 1)
-    gen_case(args, dummy_force)
+    gen_case(args, dummy_force, no_validate)
     # This is the deterministic run. For this one, we are optimizing 
     # using the base force that comes with the nastran file, as i have
     # ensure tht this value is the "test case" for the problem. 
 
 def dwu_run(args):
+    print("DWU Run selected.")
     args_out = deepcopy(args)
     args_out.n_sys = 1000
     nrf_closed = lambda x,y: normal_random_force(x, y, 150000, 20670, 0, 0.087) #Fix angle and force parameters per our e-mail. 
-    gen_case(args_out, nrf_closed)
+    gen_case(args_out, nrf_closed, no_validate)
 def main():
     args = parseargs()
     if args.special:
@@ -298,7 +306,7 @@ def main():
                 }
         cases[args.special](args)
     else:
-        gen_case(args, uniform_random_force)
+        gen_case(args, uniform_random_force, validate_inds)
 
 
 
