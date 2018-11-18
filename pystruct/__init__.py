@@ -121,7 +121,6 @@ def no_validate(inds, val_force, fname, max_wt, max_stress):
     """
     Do not perform FEM validation. Used on solutions with more traditional constraints. 
     """
-    print("NO_VAL")
     return inds
 
 def validate_inds(inds, val_force, fname, max_wt, max_stress):
