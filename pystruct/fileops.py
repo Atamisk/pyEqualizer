@@ -204,8 +204,8 @@ def to_pred(func, arg):
     if a < 0:
         return 0
 
-def max_cquad_stress(f06_fname):
-    max_stress = 0
+def act_on_stress_lines(f06_fname, proc_func):
+    retval = 0
     for i in range(5):
         try:
             with open(f06_fname) as f:
@@ -214,14 +214,30 @@ def max_cquad_stress(f06_fname):
                         skipline(f,4)
                         l = f.readline()
                         while not to_pred(l.find,'PAGE') and to_pred(l.find,'E'):
-                            max_stress = max(to_von_mises(l[87:100],l[103:116]),max_stress) 
+                            retval = proc_func(l, retval)
                             l = f.readline()
-                            max_stress = max(to_von_mises(l[87:100],l[103:116]),max_stress) 
+                            retval = proc_func(l, retval)
                             l = f.readline()
-            return max_stress
+
+            return retval
         except:
             print("ERROR: {}".format(e))
     return 1.0*10**10 # Return an absurdly high stress is the file isn't found or has failed.
+
+def max_cquad_stress(f06_fname):
+    def get_max_stress(l, last_val):
+        max_stress = last_val
+        max_stress = max(to_von_mises(l[87:100],l[103:116]),max_stress)
+        return max_stress
+    return act_on_stress_lines(f06_fname, get_max_stress)
+
+def stress_at_point(f06_fname, point):
+    def get_point_stress(l, last_val):
+        if (int(l[a:b]) == point):
+            return [l[c:d],l[e:f],l[g:h]]
+        else:
+            return 0
+    return act_on_stress_lines(f06_fname, get_point_stress)
 
 def mass(f06_name):
     """
