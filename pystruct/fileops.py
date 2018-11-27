@@ -220,7 +220,7 @@ def act_on_stress_lines(f06_fname, proc_func):
                             l = f.readline()
 
             return retval
-        except:
+        except Exception as e:
             print("ERROR: {}".format(e))
     return 1.0*10**10 # Return an absurdly high stress is the file isn't found or has failed.
 
@@ -233,10 +233,10 @@ def max_cquad_stress(f06_fname):
 
 def stress_at_point(f06_fname, point):
     def get_point_stress(l, last_val):
-        if (int(l[a:b]) == point):
-            return [l[c:d],l[e:f],l[g:h]]
+        if (l[1:9] != '        ' and int(l[1:9]) == point):
+            return [l[30:43],l[45:58],l[60:73]]
         else:
-            return 0
+            return last_val
     return act_on_stress_lines(f06_fname, get_point_stress)
 
 def mass(f06_name):
