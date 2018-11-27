@@ -214,25 +214,38 @@ def act_on_stress_lines(f06_fname, proc_func):
                         skipline(f,4)
                         l = f.readline()
                         while not to_pred(l.find,'PAGE') and to_pred(l.find,'E'):
-                            retval = proc_func(l, retval)
+                            loc = l[1:9]
+                            retval = proc_func(l, loc, retval)
                             l = f.readline()
-                            retval = proc_func(l, retval)
+                            retval = proc_func(l, loc, retval)
                             l = f.readline()
-
             return retval
         except Exception as e:
             print("ERROR: {}".format(e))
     return 1.0*10**10 # Return an absurdly high stress is the file isn't found or has failed.
 
 def max_cquad_stress(f06_fname):
-    def get_max_stress(l, last_val):
+    def get_max_stress(l, loc, last_val):
         max_stress = last_val
         max_stress = max(to_von_mises(l[87:100],l[103:116]),max_stress)
         return max_stress
     return act_on_stress_lines(f06_fname, get_max_stress)
 
+def max_cquad_stress_loc(f06_fname):
+    def get_max_stress(l, loc, last_val):
+        try:
+            old_stress = last_val[0]
+        except TypeError as e:
+            old_stress = 0
+        new_stress = max(to_von_mises(l[87:100],l[103:116]),old_stress)
+        if old_stress != new_stress:
+            return [new_stress, loc]
+        else:
+            return last_val
+    return act_on_stress_lines(f06_fname, get_max_stress)
+
 def stress_at_point(f06_fname, point):
-    def get_point_stress(l, last_val):
+    def get_point_stress(l, loc, last_val):
         if (l[1:9] != '        ' and int(l[1:9]) == point):
             return [l[30:43],l[45:58],l[60:73]]
         else:
