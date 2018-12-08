@@ -299,6 +299,23 @@ def dwu_run(args):
 
 def loc_run(args):
     print("LOCATION RUN SELECTED")
+    N_GEN = args.n_gen           # Number of generations per system. 
+    N_IND = args.n_ind           # Number of individuals per system. 
+    N_SYS = args.n_sys           # Number of systems. 
+    MAX_WT = args.max_wt         # Max Weight
+    MAX_STRESS = args.max_stress # Max Stress
+    fname = args.fname
+    start_time = time()
+
+    # Pull force parameters to randomize
+    file_lines = load_from_file(fname)
+    starting_force = read_force(file_lines)
+    all_front = []
+    
+    main_sys = system_unit(1,fname, 1,N_IND, [cost_mass, cost_stress], 
+                      [const_beta, const_mass], force = starting_force)
+    main_sys.test_and_print()
+
 
 def main():
     args = parseargs()

@@ -362,14 +362,16 @@ class system (object):
         return [Ind.from_array(a, self.sys_num) for a in out]
 
 
-class system_unit(system):
+class system_unit(object):
     def __init__(self, sys_num, fname, n_gen, n_org, 
             fitness_funcs, const_funcs, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
-        super().__init__(sys_num, fname, n_gen, n_org, 
-            fitness_funcs, const_funcs, prefix, binary, force)
+        self.__sys_1 = system(sys_num, fname, n_gen, n_org, 
+                              fitness_funcs, const_funcs, prefix, binary, force)
+        self.__sys_2 = system(sys_num, fname, n_gen, n_org, 
+                              fitness_funcs, const_funcs, prefix, binary, force)
 
     def split_force_pack(self):
-        force_1 = self.force
+        force_1 = self.__sys_1.base_force
         print(force_1)
         return 1
 
