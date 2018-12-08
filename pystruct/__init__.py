@@ -296,12 +296,17 @@ def dwu_run(args):
     args_out.n_sys = 1000
     nrf_closed = lambda x,y: normal_random_force(x, y, 150000, 20670, 0, 0.087) #Fix angle and force parameters per our e-mail. 
     gen_case(args_out, nrf_closed, no_validate)
+
+def loc_run(args):
+    print("LOCATION RUN SELECTED")
+
 def main():
     args = parseargs()
     if args.special:
         cases = {
                 1: det_run,
-                2: dwu_run
+                2: dwu_run,
+                3: loc_run
                 }
         cases[args.special](args)
     else:

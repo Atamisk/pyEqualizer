@@ -362,6 +362,23 @@ class system (object):
         return [Ind.from_array(a, self.sys_num) for a in out]
 
 
+class system_unit(system):
+    def __init__(self, sys_num, fname, n_gen, n_org, 
+            fitness_funcs, const_funcs, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
+        super().__init__(sys_num, fname, n_gen, n_org, 
+            fitness_funcs, const_funcs, prefix, binary, force)
+
+    def split_force_pack(self):
+        force_1 = self.force
+        print(force_1)
+        return 1
+
+    def test_and_print(self):
+        """
+        This subroutine is literally to be used as a testbed for the location based routines.
+        """
+        forces = self.split_force_pack()
+
 
 
             
