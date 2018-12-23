@@ -10,6 +10,7 @@ _valid_entries = ["PBAR", "PSHELL"]
 import sys
 from copy import deepcopy
 from subprocess import Popen,call
+from pystruct.stress_tensor import stress_tensor
 from multiprocessing.pool import ThreadPool
 from time import sleep
 from math import *
@@ -251,6 +252,20 @@ def stress_at_point(f06_fname, point):
         else:
             return last_val
     return act_on_stress_lines(f06_fname, get_point_stress)
+
+def stress_all_point(f06_fname):
+    def get_point_stress(l, loc, last_val):
+        try:
+            dummy = last_val[0]
+        except:
+            last_val = []
+        a = last_val + [[l[30:43],l[45:58],l[60:73]]]
+        if (l[1:9] != '        '):
+            return a
+        else:
+            return last_val
+    return act_on_stress_lines(f06_fname, get_point_stress)
+
 
 def mass(f06_name):
     """
