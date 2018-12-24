@@ -362,16 +362,32 @@ class system (object):
         return [Ind.from_array(a, self.sys_num) for a in out]
 
 
-class system_unit(object):
+class system_unit(system):
+    class tensor_ind(object):
+        def __init__(self):
+            pass
     def __init__(self, sys_num, fname, n_gen, n_org, 
-            fitness_funcs, const_funcs, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
-        self.__sys_1 = system(sys_num, fname, n_gen, n_org, 
-                              fitness_funcs, const_funcs, prefix, binary, force)
-        self.__sys_2 = system(sys_num, fname, n_gen, n_org, 
-                              fitness_funcs, const_funcs, prefix, binary, force)
+            fitness_funcs, const_funcs, x_force, y_force, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
+        """
+        Initializes the class with the passed in parameters. 
+        """
+        super().__init__(sys_num, fname, n_gen, n_org, 
+            fitness_funcs, const_funcs, prefix, binary, force)
+        self._x_force = x_force
+        self._y_force = y_force
+
+    @property
+    def x_force(self):
+        return self._x_force
+    @property
+    def y_force(self):
+        return self._y_force
+
+
+        
 
     def split_force_pack(self):
-        force_1 = self.__sys_1.base_force
+        force_1 = self.x_force
         print(force_1)
         return 1
 

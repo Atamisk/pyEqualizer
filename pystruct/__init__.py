@@ -304,6 +304,8 @@ def loc_run(args):
     N_SYS = args.n_sys           # Number of systems. 
     MAX_WT = args.max_wt         # Max Weight
     MAX_STRESS = args.max_stress # Max Stress
+    x_force = [['FORCE', '2', '918', '0', '1.', '1.+3', '0', '0.']]
+    y_force = [['FORCE', '2', '918', '0', '1.', '0.', '1.+3', '0.']]
     fname = args.fname
     start_time = time()
 
@@ -313,7 +315,8 @@ def loc_run(args):
     all_front = []
     
     main_sys = system_unit(1,fname, 1,N_IND, [cost_mass, cost_stress], 
-                      [const_beta, const_mass], force = starting_force)
+                      [const_beta, const_mass], x_force, y_force, 
+                      force = starting_force)
     main_sys.test_and_print()
 
 
