@@ -338,7 +338,7 @@ class system (object):
         out = list(zip(props, fitness, fitness_unconst))
         return out
 
-    def dummy_generation(self, last_vec):
+    def dummy_generation(self, last_vec, ind_cls = Ind):
         """
         Only analyze the supplied vector for fitness. 
 
@@ -346,7 +346,7 @@ class system (object):
         """
         last_props = [deepcopy(a.props) for a in last_vec]
         out = self.run_generation(deepcopy,last_props)
-        return [Ind.from_array(a, self.sys_num) for a in out]
+        return [ind_cls.from_array(a, self.sys_num) for a in out]
 
     def trial_generation(self, last_vec):
         #isolate the property vector from last generation
@@ -356,16 +356,18 @@ class system (object):
         trial_vec = [Ind.from_array(a, self.sys_num) for a in trial_vec_basic]
         return self.selection(last_vec, trial_vec)
 
-    def first_generation(self):
+    def first_generation(self, ind_cls = Ind):
         """first_generation(): Returns result of initial generation"""
         out = self.run_generation(self.gen_generation, [])
-        return [Ind.from_array(a, self.sys_num) for a in out]
+        return [ind_cls.from_array(a, self.sys_num) for a in out]
 
 
+class tensor_ind(Ind):
+    def __init__(self, props, sys_num, x_force, y_force):
+        super().__init__(props, sys_num)
+        self._x_tensors = []
 class system_unit(system):
-    class tensor_ind(object):
-        def __init__(self):
-            pass
+
     def __init__(self, sys_num, fname, n_gen, n_org, 
             fitness_funcs, const_funcs, x_force, y_force, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
         """
