@@ -317,6 +317,11 @@ def loc_run(args):
     main_sys = system_unit(1,fname, 1,N_IND, [cost_mass, cost_stress], 
                       [const_beta, const_mass], x_force, y_force, 
                       force = starting_force)
+    first_props = main_sys.gen_generation([])
+    first_inds = [ Ind.from_array([a,[],[]], 0) for a in first_props]
+    first_tensor_inds = main_sys.get_tensors(first_inds)
+    for x in range(len(first_tensor_inds)):
+        print("Unit {} Length:\tX:\t{}\tY:\t{}".format(x, len(first_tensor_inds[x].x_tensors),len(first_tensor_inds[x].y_tensors)))
     main_sys.test_and_print()
 
 

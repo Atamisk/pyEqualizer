@@ -111,7 +111,7 @@ def isolate_antipareto(vec):
 
 def fold_in_force(props, force):
     """
-    fold_in_force(props, vec): Fold the force set for a system into the properyies for a generation. 
+    fold_in_force(props, vec): Fold the force set for a system into the properties for a generation. 
 
     Parameters: 
     props: A vector representing a generation of individuals. In effect, an array of arrays of property cards. 
@@ -363,9 +363,19 @@ class system (object):
 
 
 class tensor_ind(Ind):
-    def __init__(self, props, sys_num, x_force, y_force):
+    def __init__(self, props, sys_num, x_force, y_force, x_tensor, y_tensor):
         super().__init__(props, sys_num)
-        self._x_tensors = []
+        self._x_tensors = x_tensor
+        self._y_tensors = y_tensor
+        self.x_force = x_force
+        self.y_force = y_force
+
+    @property
+    def x_tensors(self):
+        return deepcopy(self._x_tensors)
+    @property
+    def y_tensors(self):
+        return deepcopy(self._y_tensors)
 class system_unit(system):
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
@@ -385,8 +395,31 @@ class system_unit(system):
     def y_force(self):
         return self._y_force
 
-
+    def get_tensors(self, inds):
+        """
+        Make the x and y tensors for a given list of individuals based on this system. 
+        inputs: 
+            inds: List of input individuals
+        outputs: 
+            inds_with_tensors: individuals with tensors stored in-class. 
+        """
+        props = [deepcopy(a.props) for a in inds]
+        def run_tensor(force):
+            files = multi_file_out(fold_in_force(props, force), self.base_lines, self.prefix)
+            f06_names = [ a + ".out" for a in files ]
+            run_nastran(self.binary, files)
         
+            tensors = []
+            for f in f06_names:
+                tensors.append(stress_all_point(f))
+            return tensors
+        x_tensors = run_tensor(self.x_force)
+        y_tensors = run_tensor(self.y_force)
+
+        inds_with_tensors = []
+        for i in range(len(inds)):
+            inds_with_tensors.append(tensor_ind(props[i], self.sys_num, self.x_force, self.y_force, x_tensors[i], y_tensors[i]))
+        return inds_with_tensors  
 
     def split_force_pack(self):
         force_1 = self.x_force
