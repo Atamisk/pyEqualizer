@@ -31,4 +31,11 @@ class stress_tensor(object):
             return NotImplemented
     __radd__ = __add__
 
+    def __mul__(self, other):
+        try:
+            return stress_tensor._from_array(other * self.tensor)
+        except:
+            return NotImplemented
+    __rmul__ = __mul__
+
 

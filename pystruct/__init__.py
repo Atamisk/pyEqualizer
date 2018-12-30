@@ -322,8 +322,11 @@ def loc_run(args):
     first_tensor_inds = main_sys.get_tensors(first_inds)
     for x in range(len(first_tensor_inds)):
         print("Unit {} Length:\tX:\t{}\tY:\t{}".format(x, len(first_tensor_inds[x].x_tensors),len(first_tensor_inds[x].y_tensors)))
-    main_sys.test_and_print()
-
+    print("Applying force")
+    app = first_tensor_inds[0].apply_force(0,-150000)
+    print("done")
+    app_vm = [ x.von_mises for x in app ]
+    print(max(app_vm))
 
 def main():
     args = parseargs()

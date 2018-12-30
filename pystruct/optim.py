@@ -367,8 +367,18 @@ class tensor_ind(Ind):
         super().__init__(props, sys_num)
         self._x_tensors = x_tensor
         self._y_tensors = y_tensor
-        self.x_force = x_force
-        self.y_force = y_force
+        self.x_force = from_nas_real(x_force[0][5])  # Force used in making the tensors
+        self.y_force = from_nas_real(y_force[0][6])  # Force used in making the tensors. 
+
+    def apply_force(self, x_appforce, y_appforce):
+        """
+        Make a combined stress tensor showing the efects of an applied force.
+        """
+        out = []
+        for i in range(len(self.x_tensors)):
+            out.append( self.x_tensors[i]  * (x_appforce / self.x_force) + self.y_tensors[i] * (y_appforce / self.y_force))
+        return out
+
 
     @property
     def x_tensors(self):
@@ -411,7 +421,11 @@ class system_unit(system):
         
             tensors = []
             for f in f06_names:
-                tensors.append(stress_all_point(f))
+                stresses = stress_all_point(f)
+                file_tensors = []
+                for x in stresses:
+                    file_tensors.append(stress_tensor(float(x[0]),float(x[1]), 0, float(x[2]), 0, 0))
+                tensors.append(file_tensors)
             return tensors
         x_tensors = run_tensor(self.x_force)
         y_tensors = run_tensor(self.y_force)
