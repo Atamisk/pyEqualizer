@@ -2,6 +2,7 @@ from pystruct.fileops import *
 from pystruct.optim import *
 from pystruct.regression import *
 from matplotlib.pyplot import ioff, savefig, subplots
+from multiprocessing.pool import Pool
 import sys, getopt
 import random 
 from time import time
@@ -297,6 +298,9 @@ def dwu_run(args):
     nrf_closed = lambda x,y: normal_random_force(x, y, 150000, 20670, 0, 0.087) #Fix angle and force parameters per our e-mail. 
     gen_case(args_out, nrf_closed, no_validate)
 
+def call_apply(inst, x, y):
+    return inst.apply_force(x,y)
+
 def loc_run(args):
     print("LOCATION RUN SELECTED")
     N_GEN = args.n_gen           # Number of generations per system. 
@@ -308,6 +312,7 @@ def loc_run(args):
     y_force = [['FORCE', '2', '918', '0', '1.', '0.', '1.+3', '0.']]
     fname = args.fname
     start_time = time()
+    pool = Pool(8)
 
     # Pull force parameters to randomize
     file_lines = load_from_file(fname)
@@ -323,9 +328,11 @@ def loc_run(args):
     for x in range(len(first_tensor_inds)):
         print("Unit {} Length:\tX:\t{}\tY:\t{}".format(x, len(first_tensor_inds[x].x_tensors),len(first_tensor_inds[x].y_tensors)))
     print("Applying force")
-    app = first_tensor_inds[0].apply_force(0,-150000)
+    #app = [first_tensor_inds[x].apply_force(0,-150000) for x in range(len(first_tensor_inds))]
+    args_to_pool = [ [x, 0, -150000] for x in first_tensor_inds]
+    app = pool.starmap(call_apply, args_to_pool)
     print("done")
-    app_vm = [ x.von_mises for x in app ]
+    app_vm = [ x.von_mises for x in app[0] ]
     print(max(app_vm))
 
 def main():

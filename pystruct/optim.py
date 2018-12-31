@@ -10,6 +10,7 @@
 from pystruct.fileops import *
 from copy import deepcopy
 from numpy import array
+from multiprocessing.pool import Pool
 import random
 import lhsmdu
 import math
@@ -368,15 +369,25 @@ class tensor_ind(Ind):
         self._x_tensors = x_tensor
         self._y_tensors = y_tensor
         self.x_force = from_nas_real(x_force[0][5])  # Force used in making the tensors
-        self.y_force = from_nas_real(y_force[0][6])  # Force used in making the tensors. 
+        self.y_force = from_nas_real(y_force[0][6])  # Force used in making the tensors.
 
+    def tensor_get(self, index):
+        #return [self.x_tensors[index] * (x_appforce / self.x_force) + self.y_tensors[index] * (y_appforce / self.y_force)]
+
+        return [self.x_tensors[index], self.y_tensors[index]]
     def apply_force(self, x_appforce, y_appforce):
         """
         Make a combined stress tensor showing the efects of an applied force.
         """
+
+        #pool = Pool(8)
+        target_elements = [2,216, 712]
         out = []
-        for i in range(len(self.x_tensors)):
-            out.append( self.x_tensors[i]  * (x_appforce / self.x_force) + self.y_tensors[i] * (y_appforce / self.y_force))
+        print("diing")
+        #all_tensors = pool.map(self.tensor_get, target_elements)
+        all_tensors = [[self.x_tensors[i], self.y_tensors[i]] for i in target_elements]
+        for i in range(len(target_elements)):
+            out.append( all_tensors[i][0]  * (x_appforce / self.x_force) + all_tensors[i][1] * (y_appforce / self.y_force))
         return out
 
 
