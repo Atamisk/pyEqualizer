@@ -376,7 +376,7 @@ class tensor_ind(Ind):
         Make a combined stress tensor showing the efects of an applied force.
         """
 
-        target_elements = [2,216, 712]
+        target_elements = [100,106,219,220,221,222,277,301,575,711,712,713,744,745,824]
         out = []
         all_tensors = [[self.x_tensors[i], self.y_tensors[i]] for i in target_elements]
         for i in range(len(target_elements)):
