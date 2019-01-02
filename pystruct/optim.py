@@ -409,13 +409,39 @@ class system_unit(system):
     def y_force(self):
         return self._y_force
 
+    @property
+    def x_applied_force(self):
+        return from_nas_real(self.base_force[0][5])
+
+    @property
+    def y_applied_force(self):
+        return from_nas_real(self.base_force[0][6])
+
     def call_apply(self, inst, x, y):
+        """
+        Helper function to call a subordinate objects method
+        "apply_force". 
+        This is here because multiprocessing in Python is bizarre. 
+        Yes, it's a hack. sue me. 
+        """
         return inst.apply_force(x,y)
 
     def apply_forces(self, inds):
+        """
+        Uses multithreading to apply loads to the unit-stress tensors
+        in the individuals provided. 
+
+        inputs: 
+        inds: tensor_ind objects representing a series of designs. 
+
+        outputs: 
+        app: A nxm array of stress tensors, where n is the number of individuals in inds, 
+             and m is the number of elements that data was requested from in each individual's 
+             apply_force method. 
+        """
         pool = Pool(8)
         print("Applying force")
-        args_to_pool = [ [x, 0, -150000] for x in inds]
+        args_to_pool = [ [x, self.x_applied_force, self.y_applied_force] for x in inds]
         app = pool.starmap(self.call_apply, args_to_pool)
         print("done")
         return app

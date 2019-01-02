@@ -39,7 +39,10 @@ def to_nas_real(number):
 
 def from_nas_real(string):
     lst = string.split('+')
-    return float(lst[0]) * 10 ** int(lst[1])
+    if len(lst) > 1:
+        return float(lst[0]) * 10 ** int(lst[1])
+    else:
+        return float(lst[0])
 
 def split_bulk(instr):
     line = []
