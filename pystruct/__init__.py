@@ -298,8 +298,6 @@ def dwu_run(args):
     nrf_closed = lambda x,y: normal_random_force(x, y, 150000, 20670, 0, 0.087) #Fix angle and force parameters per our e-mail. 
     gen_case(args_out, nrf_closed, no_validate)
 
-def call_apply(inst, x, y):
-    return inst.apply_force(x,y)
 
 def loc_run(args):
     print("LOCATION RUN SELECTED")
@@ -327,11 +325,7 @@ def loc_run(args):
     first_tensor_inds = main_sys.get_tensors(first_inds)
     for x in range(len(first_tensor_inds)):
         print("Unit {} Length:\tX:\t{}\tY:\t{}".format(x, len(first_tensor_inds[x].x_tensors),len(first_tensor_inds[x].y_tensors)))
-    print("Applying force")
-    #app = [first_tensor_inds[x].apply_force(0,-150000) for x in range(len(first_tensor_inds))]
-    args_to_pool = [ [x, 0, -150000] for x in first_tensor_inds]
-    app = pool.starmap(call_apply, args_to_pool)
-    print("done")
+    app = main_sys.apply_forces(first_tensor_inds)
     app_vm = [ x.von_mises for x in app[0] ]
     print(max(app_vm))
 

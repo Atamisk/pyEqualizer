@@ -409,6 +409,18 @@ class system_unit(system):
     def y_force(self):
         return self._y_force
 
+    def call_apply(self, inst, x, y):
+        return inst.apply_force(x,y)
+
+    def apply_forces(self, inds):
+        pool = Pool(8)
+        print("Applying force")
+        args_to_pool = [ [x, 0, -150000] for x in inds]
+        app = pool.starmap(self.call_apply, args_to_pool)
+        print("done")
+        return app
+        
+
     def get_tensors(self, inds):
         """
         Make the x and y tensors for a given list of individuals based on this system. 
