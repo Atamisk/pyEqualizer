@@ -364,12 +364,13 @@ class system (object):
 
 
 class tensor_ind(Ind):
-    def __init__(self, props, sys_num, x_force, y_force, x_tensor, y_tensor):
+    def __init__(self, props, sys_num, x_force, y_force, x_tensor, y_tensor, mass):
         super().__init__(props, sys_num)
         self._x_tensors = x_tensor
         self._y_tensors = y_tensor
         self.x_force = from_nas_real(x_force[0][5])  # Force used in making the tensors
         self.y_force = from_nas_real(y_force[0][6])  # Force used in making the tensors.
+        self._mass = mass
 
     def apply_force(self, x_appforce, y_appforce):
         """
@@ -383,13 +384,15 @@ class tensor_ind(Ind):
             out.append( all_tensors[i][0]  * (x_appforce / self.x_force) + all_tensors[i][1] * (y_appforce / self.y_force))
         return out
 
-
     @property
     def x_tensors(self):
         return deepcopy(self._x_tensors)
     @property
     def y_tensors(self):
         return deepcopy(self._y_tensors)
+    @property
+    def mass(self):
+        return deepcopy(mass)
 class system_unit(system):
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
@@ -416,6 +419,11 @@ class system_unit(system):
     @property
     def y_applied_force(self):
         return from_nas_real(self.base_force[0][6])
+
+    #def get_fitness_vector(self, inds, files):
+    #    pass
+    #def run_generation(self, prop_func, last_props):
+    #    pass
 
     def call_apply(self, inst, x, y):
         """
@@ -450,6 +458,7 @@ class system_unit(system):
     def get_tensors(self, inds):
         """
         Make the x and y tensors for a given list of individuals based on this system. 
+        This function also sets the individual's mass. 
         inputs: 
             inds: List of input individuals
         outputs: 
@@ -468,13 +477,15 @@ class system_unit(system):
                 for x in stresses:
                     file_tensors.append(stress_tensor(float(x[0]),float(x[1]), 0, float(x[2]), 0, 0))
                 tensors.append(file_tensors)
-            return tensors
-        x_tensors = run_tensor(self.x_force)
-        y_tensors = run_tensor(self.y_force)
+            return [tensors, f06_names]
+        # Get system mass.
+        [x_tensors, _] = run_tensor(self.x_force)
+        [y_tensors, f06_names] = run_tensor(self.y_force)
+        masses = [mass(f) for f in f06_names]
 
         inds_with_tensors = []
         for i in range(len(inds)):
-            inds_with_tensors.append(tensor_ind(props[i], self.sys_num, self.x_force, self.y_force, x_tensors[i], y_tensors[i]))
+            inds_with_tensors.append(tensor_ind(props[i], self.sys_num, self.x_force, self.y_force, x_tensors[i], y_tensors[i], masses[i]))
         return inds_with_tensors  
 
     def split_force_pack(self):
