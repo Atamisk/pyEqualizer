@@ -220,6 +220,10 @@ def gen_case(args, force_func, val_func):
         _ , _ = plot_with_front(latest_vec, front, 'System {}'.format(str(x)) ,'/tmp/output_sys_' + str(x) + '.png')
         all_front.append(front)
 
+    val_func_closed = lambda x: val_func(x, starting_force, fname, MAX_WT, MAX_STRESS)
+    prepare_report(all_front, val_func_closed, force_packs)
+
+def prepare_report(all_front, val_func, force_packs):
     #Gather all fronts combined. 
     all_front_mixed = []
     for x in all_front:
@@ -230,7 +234,7 @@ def gen_case(args, force_func, val_func):
     fig, ax = subplots()
 
     #Validate all optimal designs against the maximum load 
-    valid_designs = val_func(all_front_mixed, starting_force, fname, MAX_WT, MAX_STRESS)
+    valid_designs = val_func(all_front_mixed)
 
     #Generate final selected designs from all paretos. 
     final_front = isolate_pareto(valid_designs)
@@ -309,8 +313,6 @@ def loc_run(args):
     x_force = [['FORCE', '2', '918', '0', '1.', '1.+3', '0', '0.']]
     y_force = [['FORCE', '2', '918', '0', '1.', '0.', '1.+3', '0.']]
     fname = args.fname
-    start_time = time()
-    pool = Pool(8)
     start_time = time()
 
     # Pull force parameters to randomize
