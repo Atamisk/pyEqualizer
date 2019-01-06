@@ -311,6 +311,7 @@ def loc_run(args):
     fname = args.fname
     start_time = time()
     pool = Pool(8)
+    start_time = time()
 
     # Pull force parameters to randomize
     file_lines = load_from_file(fname)
@@ -321,11 +322,15 @@ def loc_run(args):
                       [const_beta, const_mass], x_force, y_force, 
                       force = starting_force)
     first_inds = main_sys.first_generation([])
-    for x in range(len(first_inds)):
-        print("Unit {} Length:\tX:\t{}\tY:\t{}".format(x, len(first_inds[x].x_tensors),len(first_inds[x].y_tensors)))
-    app = main_sys.apply_forces(first_inds)
-    app_vm = [ x.von_mises for x in app[0] ]
-    print(max(app_vm))
+    print("First generation initialized at T+{}".format(time() - start_time))
+    last_inds = first_inds
+    print(sum([ x.mass for x in last_inds]))
+    for i in range(N_GEN):
+        last_inds = main_sys.trial_generation(last_inds)
+        print("Generation {} initialized at T+{}".format(i, time() - start_time))
+        print(sum([ x.mass for x in last_inds]))
+    print(first_inds[0].fitness)
+    print(last_inds[0].fitness)
 
 def main():
     args = parseargs()

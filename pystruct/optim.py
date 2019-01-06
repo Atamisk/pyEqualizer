@@ -28,7 +28,7 @@ class Ind(object):
     def __init__(self, props, sys_num):
         self.props = props
         self.sys_num = sys_num
-        self.fitness = -1000
+        self._fitness = -1000
 
     def to_array(self):
         return [self.props, self.fitness]
@@ -36,9 +36,12 @@ class Ind(object):
     @classmethod
     def from_array(cls, array, sys_num):
         obj = cls(array[0], sys_num)
-        obj.fitness = array[1]
+        obj._fitness = array[1]
         obj.fitness_unconst = array[2]
         return obj
+    @property
+    def fitness(self):
+        return self._fitness
 
     def __str__(self):
         out = "***SYSTEM DEFINITION***"
@@ -370,6 +373,7 @@ class tensor_ind(Ind):
         self.x_force = from_nas_real(x_force[0][5])  # Force used in making the tensors
         self.y_force = from_nas_real(y_force[0][6])  # Force used in making the tensors.
         self._mass = mass
+        self.max_stress = -1
 
     def apply_force(self, x_appforce, y_appforce):
         """
@@ -391,7 +395,10 @@ class tensor_ind(Ind):
         return deepcopy(self._y_tensors)
     @property
     def mass(self):
-        return deepcopy(mass)
+        return deepcopy(self._mass)
+    @property
+    def fitness(self):
+        return [self.max_stress, self.mass]
 class system_unit(system):
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
@@ -430,7 +437,11 @@ class system_unit(system):
         last_props: props from the last generation. 
         """
         props = prop_func(last_props)
-        return self.get_tensors_from_props(props)
+        out = self.get_tensors_from_props(props)
+        all_str = self.apply_forces(out)
+        for x in range(len(out)):
+            out[x].max_stress = max([y.von_mises for y in all_str[x]])
+        return out
 
     def call_apply(self, inst, x, y):
         """
@@ -455,10 +466,8 @@ class system_unit(system):
              apply_force method. 
         """
         pool = Pool(8)
-        print("Applying force")
         args_to_pool = [ [x, self.x_applied_force, self.y_applied_force] for x in inds]
         app = pool.starmap(self.call_apply, args_to_pool)
-        print("done")
         return app
         
 
@@ -492,7 +501,6 @@ class system_unit(system):
         [x_tensors, _] = run_tensor(self.x_force)
         [y_tensors, f06_names] = run_tensor(self.y_force)
         masses = [mass(f) for f in f06_names]
-
         inds_with_tensors = []
         for i in range(len(props)):
             inds_with_tensors.append(tensor_ind(props[i], self.sys_num, self.x_force, self.y_force, x_tensors[i], y_tensors[i], masses[i]))
