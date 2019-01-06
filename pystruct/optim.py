@@ -336,7 +336,7 @@ class system (object):
         files = multi_file_out(fold_in_force(props, self.__base_force), self.base_lines, self.prefix)
         run_nastran(self.binary, files)
         fitness, fitness_unconst = self.get_fitness_vector(props, files)
-        out = list(zip(props, fitness, fitness_unconst))
+        out = [Ind.from_array(a, self.sys_num) for a in list(zip(props, fitness, fitness_unconst))]
         return out
 
     def dummy_generation(self, last_vec, ind_cls = Ind):
@@ -347,20 +347,19 @@ class system (object):
         """
         last_props = [deepcopy(a.props) for a in last_vec]
         out = self.run_generation(deepcopy,last_props)
-        return [ind_cls.from_array(a, self.sys_num) for a in out]
+        return out
 
     def trial_generation(self, last_vec):
         #isolate the property vector from last generation
         last_props = [deepcopy(a.props) for a in last_vec]
         #run the crossover function to obtain trial vector with fitnesses. 
-        trial_vec_basic = self.run_generation(self.crossover, last_props)
-        trial_vec = [Ind.from_array(a, self.sys_num) for a in trial_vec_basic]
+        trial_vec = self.run_generation(self.crossover, last_props)
         return self.selection(last_vec, trial_vec)
 
     def first_generation(self, ind_cls = Ind):
         """first_generation(): Returns result of initial generation"""
         out = self.run_generation(self.gen_generation, [])
-        return [ind_cls.from_array(a, self.sys_num) for a in out]
+        return out
 
 
 class tensor_ind(Ind):
@@ -422,8 +421,16 @@ class system_unit(system):
 
     #def get_fitness_vector(self, inds, files):
     #    pass
-    #def run_generation(self, prop_func, last_props):
-    #    pass
+    def run_generation(self, prop_func, last_props):
+        """
+        run_generation(): Run a single generation of the optimiser, stopping at the fitness function generation. 
+
+        Arguments: 
+        prop_func: Function that determines the population of the current generation. 
+        last_props: props from the last generation. 
+        """
+        props = prop_func(last_props)
+        return self.get_tensors_from_props(props)
 
     def call_apply(self, inst, x, y):
         """
@@ -462,9 +469,12 @@ class system_unit(system):
         inputs: 
             inds: List of input individuals
         outputs: 
-            inds_with_tensors: individuals with tensors stored in-class. 
+            (return object): individuals with tensors stored in-class. 
         """
         props = [deepcopy(a.props) for a in inds]
+        return self.get_tensors_from_props(props)
+
+    def get_tensors_from_props(self, props):
         def run_tensor(force):
             files = multi_file_out(fold_in_force(props, force), self.base_lines, self.prefix)
             f06_names = [ a + ".out" for a in files ]
@@ -484,7 +494,7 @@ class system_unit(system):
         masses = [mass(f) for f in f06_names]
 
         inds_with_tensors = []
-        for i in range(len(inds)):
+        for i in range(len(props)):
             inds_with_tensors.append(tensor_ind(props[i], self.sys_num, self.x_force, self.y_force, x_tensors[i], y_tensors[i], masses[i]))
         return inds_with_tensors  
 
