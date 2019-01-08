@@ -399,6 +399,9 @@ class tensor_ind(Ind):
     @property
     def fitness(self):
         return [self.max_stress, self.mass]
+    #  For right now, this is here for compatibility. Future 
+    # releases will have these two values differ. 
+    fitness_unconst = fitness
 class system_unit(system):
 
     def __init__(self, sys_num, fname, n_gen, n_org, 

@@ -151,7 +151,8 @@ def print_ind(ind):
     print("    Max Stress:\t\t\t\t{:4.2e} MPa".format(float(ind.fitness_unconst[1])))
     print("    Weight:\t\t\t\t{:4.2e} kg".format(float(ind.fitness_unconst[0])))
 
-def print_load_case(lc,case_num):
+def print_load_case(sys,case_num):
+    lc = sys.base_force
     print("Load Case {}".format(case_num))
     print("  X Force:\t{:4.2e}".format(from_nas_real(lc[0][5])))
     print("  Y Force:\t{:4.2e}".format(from_nas_real(lc[0][6])))
@@ -194,7 +195,7 @@ def gen_case(args, force_func, val_func):
 
     all_front = optimize_systems(systems, N_GEN)
     val_func_closed = lambda x: val_func(x, starting_force, fname, MAX_WT, MAX_STRESS)
-    prepare_report(all_front, val_func_closed, force_packs)
+    prepare_report(all_front, val_func_closed, systems)
 
 def optimize_systems(systems, N_GEN):
     """
@@ -237,7 +238,7 @@ def optimize_systems(systems, N_GEN):
         all_front.append(front)
     return all_front
 
-def prepare_report(all_front, val_func, force_packs):
+def prepare_report(all_front, val_func, systems):
     #Gather all fronts combined. 
     all_front_mixed = []
     for x in all_front:
@@ -276,8 +277,8 @@ def prepare_report(all_front, val_func, force_packs):
     print("Program Complete.")
     print("\nLoad Case Summary:")
     print(  "----------------------")
-    for x in range(len(force_packs)):
-        print_load_case(force_packs[x],x)
+    for x in range(len(systems)):
+        print_load_case(systems[x],x)
     print("\nSummary of valid designs:")
     print(  "--------------------------")
     for x in range(len(final_front)):
@@ -332,22 +333,13 @@ def loc_run(args):
     # Pull force parameters to randomize
     file_lines = load_from_file(fname)
     starting_force = read_force(file_lines)
-    all_front = []
     
-    main_sys = system_unit(1,fname, 1,N_IND, [cost_mass, cost_stress], 
+    systems = [system_unit(1,fname, 1,N_IND, [cost_mass, cost_stress], 
                       [const_beta, const_mass], x_force, y_force, 
-                      force = starting_force)
-    first_inds = main_sys.first_generation([])
-    print("First generation initialized at T+{}".format(time() - start_time))
-    last_inds = first_inds
-    print(sum([ x.mass for x in last_inds]))
-    for i in range(N_GEN):
-        last_inds = main_sys.trial_generation(last_inds)
-        print("Generation {} initialized at T+{}".format(i, time() - start_time))
-        print(sum([ x.mass for x in last_inds]))
-    print(first_inds[0].fitness)
-    print(last_inds[0].fitness)
-
+                      force = starting_force)]
+    all_front = optimize_systems(systems, N_GEN)
+    val_closed = lambda x: no_validate(x,[],[],[],[])
+    prepare_report(all_front, val_closed, systems)
 def main():
     args = parseargs()
     if args.special:
