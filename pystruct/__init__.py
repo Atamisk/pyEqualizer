@@ -182,21 +182,37 @@ def gen_case(args, force_func, val_func):
     MAX_WT = args.max_wt         # Max Weight
     MAX_STRESS = args.max_stress # Max Stress
     fname = args.fname
-    start_time = time()
 
     # Pull force parameters to randomize
     file_lines = load_from_file(fname)
     starting_force = read_force(file_lines)
-    all_front = []
     #Generate random forces
     force_packs = force_func(starting_force, N_SYS)
+    
+    systems = [system(x,fname, 1,N_IND, [cost_mass, cost_stress], 
+        [const_beta, const_mass], force = force_packs[x]) for x in range(len(force_packs))]
 
-    #For each random force generated...
-    for x in range(len(force_packs)):
-        main_sys = system(x,fname, 1,N_IND, [cost_mass, cost_stress], 
-                          [const_beta, const_mass], force = force_packs[x])
+    all_front = optimize_systems(systems, N_GEN)
+    val_func_closed = lambda x: val_func(x, starting_force, fname, MAX_WT, MAX_STRESS)
+    prepare_report(all_front, val_func_closed, force_packs)
+
+def optimize_systems(systems, N_GEN):
+    """
+    Main optimization loop for the program. 
+    Inputs:
+      systems   -- List of pystruct.optim.system objects that make up the load cases to be analyzed.
+      N_GEN     -- Number of generations to run each optimization for.
+    Output: 
+      all_front -- A sorted list of pareto fronts from each system, presented as an
+                   array of arrays of pystruct.optim.Ind objects. 
+    """
+    print("Analysis Started.")
+    start_time = time()
+    all_front = []
+    #Main analysis loop.
+    for x in range(len(systems)):
+        main_sys = systems[x]
         latest_vec = main_sys.first_generation()
-        
         for i in range(N_GEN):
             print("Generation {} in system {} starting at T+ {:.3f}".format(i, x, time()-start_time))
             latest_vec = main_sys.trial_generation(latest_vec)
@@ -219,9 +235,7 @@ def gen_case(args, force_func, val_func):
         front = isolate_pareto(latest_vec)
         _ , _ = plot_with_front(latest_vec, front, 'System {}'.format(str(x)) ,'/tmp/output_sys_' + str(x) + '.png')
         all_front.append(front)
-
-    val_func_closed = lambda x: val_func(x, starting_force, fname, MAX_WT, MAX_STRESS)
-    prepare_report(all_front, val_func_closed, force_packs)
+    return all_front
 
 def prepare_report(all_front, val_func, force_packs):
     #Gather all fronts combined. 
