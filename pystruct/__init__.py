@@ -328,7 +328,6 @@ def loc_run(args):
     x_force = [['FORCE', '2', '918', '0', '1.', '1.+3', '0', '0.']]
     y_force = [['FORCE', '2', '918', '0', '1.', '0.', '1.+3', '0.']]
     fname = args.fname
-    start_time = time()
 
     # Pull force parameters to randomize
     file_lines = load_from_file(fname)
