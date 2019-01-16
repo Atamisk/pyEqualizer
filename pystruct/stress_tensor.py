@@ -1,4 +1,4 @@
-from numpy import array, add, trace
+from numpy import array, add, trace, eye, size, shape, tensordot
 
 class stress_tensor(object):
     def __init__(self, sx, sy, sz, txy, tyz, tzx):
@@ -20,9 +20,12 @@ class stress_tensor(object):
         return self._tensor
     @property
     def von_mises(self):
-        sdev = self.tensor - 1/3*trace(self.tensor)
-        J2 = 0.5 * trace(sdev @ sdev)
-        return (3 * J2) ** 0.5
+        sdev = self.deviator
+        return (3/2 * tensordot(sdev, sdev))**0.5
+    @property
+    def deviator(self):
+        t = self.tensor
+        return t - eye(*shape(t)) * trace(t) / 3.0
 
     def __add__(self, other):
         try:
