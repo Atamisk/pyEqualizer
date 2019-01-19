@@ -374,13 +374,24 @@ class tensor_ind(Ind):
         self.y_force = from_nas_real(y_force[0][6])  # Force used in making the tensors.
         self._mass = mass
         self.max_stress = -1
+        target_elements = [100,106,219,220,221,222,277,301,575,711,712,713,744,745,824]
+
+    def apply_stochastic_force(self, mu_x, mu_y, sigma_x, sigma_y):
+        """
+        Apply a stochastically defined force. 
+        Inputs: 
+            mu_x = mean of the x applied force
+            mu_y = mean of the y applied force
+            sigma_x = std.dev of the x applied force
+            sigma_y = std.dev of the y applied force
+        """
+        pass
 
     def apply_force(self, x_appforce, y_appforce):
         """
         Make a combined stress tensor showing the efects of an applied force.
         """
-
-        target_elements = [100,106,219,220,221,222,277,301,575,711,712,713,744,745,824]
+        target_elements = self.target_elements
         out = []
         all_tensors = [[self.x_tensors[i], self.y_tensors[i]] for i in target_elements]
         for i in range(len(target_elements)):
