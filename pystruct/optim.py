@@ -9,7 +9,7 @@
 """
 from pystruct.fileops import *
 from copy import deepcopy
-from numpy import array
+from numpy import array,trace,
 from multiprocessing.pool import Pool
 import random
 import lhsmdu
@@ -378,14 +378,21 @@ class tensor_ind(Ind):
 
     def apply_stochastic_force(self, mu_x, mu_y, sigma_x, sigma_y):
         """
-        Apply a stochastically defined force. 
+        Apply a stochasticallay defined force. 
         Inputs: 
             mu_x = mean of the x applied force
             mu_y = mean of the y applied force
             sigma_x = std.dev of the x applied force
             sigma_y = std.dev of the y applied force
         """
-        pass
+       for i in self.target_elements:
+           s_x = self.x_tensors[i]
+           s_y = self.y_tensors[i]
+           sd_x = s_x.deviator
+           sd_y = s_y.deviator
+           alpha = ((sd_x@sd_x)*mu_x**2 + ((sd_x @ sd_y) + (sd_y @ sd_x)) * mu_x * mu_y
+                   + (sd_y @ sd_y) * mu_y**2)
+
 
     def apply_force(self, x_appforce, y_appforce):
         """
