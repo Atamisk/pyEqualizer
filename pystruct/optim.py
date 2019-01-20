@@ -385,14 +385,38 @@ class tensor_ind(Ind):
             sigma_x = std.dev of the x applied force
             sigma_y = std.dev of the y applied force
         """
-        for i in self.target_elements:
+        out = []
+        def get_stress_from_index(i):
            s_x = self.x_tensors[i] * (self.x_force**-1)
            s_y = self.y_tensors[i] * (self.y_force**-1)
            sd_x = s_x.deviator
            sd_y = s_y.deviator
            alpha = ((sd_x@sd_x)*mu_x**2 + ((sd_x @ sd_y) + (sd_y @ sd_x)) * mu_x * mu_y
                    + (sd_y @ sd_y) * mu_y**2).trace()
-           print((3/2*alpha)**0.5)
+           fd_alpha_px = ((sd_x@sd_x)*2*mu_x + ((sd_x @ sd_y) + (sd_y @ sd_x)) * mu_y).trace()
+           sd_alpha_px = ((sd_x@sd_x)*2).trace()
+           fd_alpha_py = (((sd_x @ sd_y) + (sd_y @ sd_x)) * mu_x + (sd_y @ sd_y) * 2 * mu_y).trace()
+           sd_alpha_py = ((sd_y @ sd_y) * 2).trace()
+
+           s_vm = (3/2*alpha)**0.5
+           fd_svm_px = (3/4) * (3/2*alpha)**-0.5 * fd_alpha_px
+           sd_svm_px = ((3/4) * sd_alpha_px * (3/2 * alpha)**-0.5) + ((-9/16) * (3/2*alpha)**(-3/2) * fd_alpha_px**2)
+           fd_svm_py = (3/4) * (3/2*alpha)**-0.5 * fd_alpha_py
+           sd_svm_py = ((3/4) * sd_alpha_py * (3/2 * alpha)**-0.5) + ((-9/16) * (3/2*alpha)**(-3/2) * fd_alpha_py**2)
+
+           E_svm = s_vm + (1.2) * (sd_svm_px * sigma_x**2 + sd_svm_py * sigma_y**2)
+           sigma_svm = (((fd_svm_px * sigma_x)**2) + ((fd_svm_py * sigma_y)**2) + ((1/4) * ((sd_svm_px * sigma_x**2)**2 + 
+                       (sd_svm_py * sigma_y**2)**2)))**0.5
+           return [E_svm, sigma_svm]
+           
+        for i in self.target_elements:
+            out.append(get_stress_from_index(i))
+            
+        return out
+
+
+
+
 
 
     def apply_force(self, x_appforce, y_appforce):
