@@ -332,11 +332,10 @@ def loc_run(args):
     # Pull force parameters to randomize
     file_lines = load_from_file(fname)
     starting_force = read_force(file_lines)
-    force_packs = normal_random_force(starting_force, N_SYS, 150000, 20670, 0, 0.087) #Fix angle and force parameters per our e-mail. 
     
-    systems = [system_unit(x,fname, 1,N_IND, [cost_mass, cost_stress], 
+    systems = [system_unit(1,fname, 1,N_IND, [cost_mass, cost_stress], 
                       [const_beta, const_mass], x_force, y_force, 
-                      force = force_packs[x]) for x in range(len(force_packs))]
+                      force = starting_force)]
     all_front = optimize_systems(systems, N_GEN)
     val_closed = lambda x: no_validate(x,[],[],[],[])
     prepare_report(all_front, val_closed, systems)
