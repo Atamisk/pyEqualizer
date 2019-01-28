@@ -442,7 +442,7 @@ class tensor_ind(Ind):
 class system_unit(system):
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
-            fitness_funcs, const_funcs, x_force, y_force, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
+             const_funcs, x_force, y_force, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
         #TODO: Rejigger this constructor to take stochastic force definitions. Maybe as an object?
         """
         Initializes the class with the passed in parameters. 

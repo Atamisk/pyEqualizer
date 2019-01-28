@@ -333,7 +333,7 @@ def loc_run(args):
     file_lines = load_from_file(fname)
     starting_force = read_force(file_lines)
     
-    systems = [system_unit(1,fname, 1,N_IND, [cost_mass, cost_stress], 
+    systems = [system_unit(1,fname, 1,N_IND,  
                       [const_beta, const_mass], x_force, y_force, 
                       force = starting_force)]
     all_front = optimize_systems(systems, N_GEN)
