@@ -231,7 +231,6 @@ class system (object):
         gen_generation(): Randomly generate an array of property sets that
                           represent a generation of the current system. 
 
-        TODO: Implement latin hypercube sampling
         """
         props = []
         lhs_exp = make_linear_map(0,250)
@@ -462,7 +461,7 @@ class system_unit(system):
         force:   Actual applied force to the object under test. Presented as a NASTRAN input card. 
         """
         super().__init__(sys_num, fname, n_gen, n_org, 
-            fitness_funcs, const_funcs, prefix, binary, force)
+            [], const_funcs, prefix, binary, force)
         self._x_force = x_force
         self._y_force = y_force
 
