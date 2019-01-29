@@ -442,7 +442,7 @@ class tensor_ind(Ind):
 class system_unit(system):
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
-             const_funcs, x_force, y_force, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
+              x_force, y_force, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
         #TODO: Rejigger this constructor to take stochastic force definitions. Maybe as an object?
         """
         Initializes the class with the passed in parameters. 
@@ -452,8 +452,6 @@ class system_unit(system):
         fname:   File name of the base NASTRAN input deck the analysis is based on. 
         n_gen:   Number of generations. 
         n_org:   number of organisms in each generation. 
-        fitness_funcs: fitness functions presented as an array of functions. TODO: Is this defunct?
-        const_funcs:   constraint functions presented as an aray of functions. TODO: Ditto. 
         x_force: X force to apply when making individual unit tensors. 
         y_force: Y Force to apply when making individual unit tensors.
         prefix:  Prefix for nastran derived input decks. AKA scratch directory. 
@@ -461,7 +459,7 @@ class system_unit(system):
         force:   Actual applied force to the object under test. Presented as a NASTRAN input card. 
         """
         super().__init__(sys_num, fname, n_gen, n_org, 
-            [], const_funcs, prefix, binary, force)
+            [], [], prefix, binary, force)
         self._x_force = x_force
         self._y_force = y_force
 

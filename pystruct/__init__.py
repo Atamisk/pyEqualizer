@@ -334,8 +334,7 @@ def loc_run(args):
     starting_force = read_force(file_lines)
     
     systems = [system_unit(1,fname, 1,N_IND,  
-                      [const_beta, const_mass], x_force, y_force, 
-                      force = starting_force)]
+               x_force, y_force, force = starting_force)]
     all_front = optimize_systems(systems, N_GEN)
     val_closed = lambda x: no_validate(x,[],[],[],[])
     prepare_report(all_front, val_closed, systems)
