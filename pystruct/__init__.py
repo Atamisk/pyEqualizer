@@ -1,6 +1,8 @@
 from pystruct.fileops import *
 from pystruct.optim import *
 from pystruct.regression import *
+from pystruct.nr_var import *
+from pystruct.nas_utils import *
 from matplotlib.pyplot import ioff, savefig, subplots
 from multiprocessing.pool import Pool
 import sys, getopt
@@ -9,6 +11,17 @@ from time import time
 import argparse
 import msslhs
 
+def test_open_force_pack(f, n1,n2,n3):
+    """
+    Make a force pack compliant with the master's project force input. 
+    inputs: 
+        f: scale factor for the force vector. 
+        n1,n2,n3: Components of the force vector (x,y,z)
+    outputs: 
+        pack: Force pack suitable for using with the force adding methods already generated. 
+    """
+    pack = [to_nas_force(2,918,0,f,n1,n2,n3)] 
+    return pack
 
 def cost_stress(files):
     """
@@ -326,7 +339,7 @@ def loc_run(args):
     MAX_WT = args.max_wt         # Max Weight
     MAX_STRESS = args.max_stress # Max Stress
     x_force = [['FORCE', '2', '918', '0', '1.', '1.+3', '0', '0.']]
-    y_force = [['FORCE', '2', '918', '0', '1.', '0.', '1.+3', '0.']]
+    y_force = [['FORCE', '2', '918', '0', '1', '0.', '1.+3', '0.']]
     fname = args.fname
 
     # Pull force parameters to randomize

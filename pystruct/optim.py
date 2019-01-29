@@ -8,6 +8,7 @@
   Date:   2018-07-12
 """
 from pystruct.fileops import *
+from pystruct.nr_var import *
 from copy import deepcopy
 from numpy import array,trace
 from multiprocessing.pool import Pool
@@ -383,6 +384,8 @@ class tensor_ind(Ind):
             mu_y = mean of the y applied force
             sigma_x = std.dev of the x applied force
             sigma_y = std.dev of the y applied force
+        Outputs:
+            out: State of stress at each tensor. 
         """
         out = []
         def get_stress_from_index(i):
