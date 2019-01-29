@@ -338,8 +338,8 @@ def loc_run(args):
     N_SYS = args.n_sys           # Number of systems. 
     MAX_WT = args.max_wt         # Max Weight
     MAX_STRESS = args.max_stress # Max Stress
-    x_force = [['FORCE', '2', '918', '0', '1.', '1.+3', '0.', '0.']]
-    y_force = [['FORCE', '2', '918', '0', '1.', '0.', '1.+3', '0.']]
+    x_force = test_open_force_pack(1,1000,0,0)
+    y_force = test_open_force_pack(1,0,1000,0)
     fname = args.fname
 
     # Pull force parameters to randomize
