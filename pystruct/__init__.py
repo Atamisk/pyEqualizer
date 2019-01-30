@@ -340,6 +340,8 @@ def loc_run(args):
     MAX_STRESS = args.max_stress # Max Stress
     x_force = test_open_force_pack(1,1000,0,0)
     y_force = test_open_force_pack(1,0,1000,0)
+    sto_force_x = nr_var(0,5000)
+    sto_force_y = nr_var(150000,19500)
     fname = args.fname
 
     # Pull force parameters to randomize
@@ -347,7 +349,7 @@ def loc_run(args):
     starting_force = read_force(file_lines)
     
     systems = [system_unit(1,fname, 1,N_IND,  
-               x_force, y_force, force = starting_force)]
+               x_force, y_force, sto_force_x, sto_force_y)]
     all_front = optimize_systems(systems, N_GEN)
     val_closed = lambda x: no_validate(x,[],[],[],[])
     prepare_report(all_front, val_closed, systems)
