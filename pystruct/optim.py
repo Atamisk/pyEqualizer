@@ -9,6 +9,7 @@
 """
 from pystruct.fileops import *
 from pystruct.nr_var import *
+from pystruct.math_utils import *
 from copy import deepcopy
 from numpy import array,trace
 from multiprocessing.pool import Pool
@@ -373,7 +374,7 @@ class tensor_ind(Ind):
         self.x_force = from_nas_real(x_force[0][5])  # Force used in making the tensors
         self.y_force = from_nas_real(y_force[0][6])  # Force used in making the tensors.
         self._mass = mass
-        self.max_stress = -1
+        self.min_beta = -1
         self.target_elements = [100,106,219,220,221,222,277,301,575,711,712,713,744,745,824]
 
     def apply_stochastic_force(self, sto_force_x, sto_force_y):
@@ -411,7 +412,7 @@ class tensor_ind(Ind):
            E_svm = s_vm + (1.2) * (sd_svm_px * sigma_x**2 + sd_svm_py * sigma_y**2)
            sigma_svm = (((fd_svm_px * sigma_x)**2) + ((fd_svm_py * sigma_y)**2) + ((1/4) * ((sd_svm_px * sigma_x**2)**2 + 
                        (sd_svm_py * sigma_y**2)**2)))**0.5
-           return [E_svm, sigma_svm]
+           return nr_var(E_svm, sigma_svm)
            
         for i in self.target_elements:
             out.append(get_stress_from_index(i))
@@ -440,7 +441,7 @@ class tensor_ind(Ind):
         return deepcopy(self._mass)
     @property
     def fitness(self):
-        return [self.mass, self.max_stress]
+        return [self.mass, self.min_beta]
     #  For right now, this is here for compatibility. Future 
     # releases will have these two values differ. 
     fitness_unconst = fitness
@@ -506,8 +507,9 @@ class system_unit(system):
         props = prop_func(last_props)
         out = self.get_tensors_from_props(props)
         all_str = self.apply_forces(out)
+        strength = nr_var(36000, 36000*0.13)
         for x in range(len(out)):
-            out[x].max_stress = max([y.von_mises for y in all_str[x]])
+            out[x].min_beta = min([calc_beta(y, strength) for y in all_str[x]])
         return out
 
     def call_apply(self, inst, x, y):
@@ -517,7 +519,7 @@ class system_unit(system):
         This is here because multiprocessing in Python is bizarre. 
         Yes, it's a hack. sue me. 
         """
-        return inst.apply_force(x,y)
+        return inst.apply_stochastic_force(x,y)
 
     def apply_forces(self, inds):
         """
@@ -533,7 +535,7 @@ class system_unit(system):
              apply_force method. 
         """
         pool = Pool(8)
-        args_to_pool = [ [x, self.x_applied_force, self.y_applied_force] for x in inds]
+        args_to_pool = [ [x, self.sto_force_x, self.sto_force_y] for x in inds]
         app = pool.starmap(self.call_apply, args_to_pool)
         return app
         

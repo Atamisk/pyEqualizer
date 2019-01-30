@@ -1,3 +1,4 @@
+from copy import deepcopy
 class nr_var(object):
     def __init__(self, mu, sigma):
         """
