@@ -17,15 +17,6 @@ import random
 import lhsmdu
 import math
 
-# TODO: Safely Implement Location Based sampling. 
-# Solutiuon outline: 
-#1. Identify points of interest (Probably done manually by the designer. 
-#2. Analyze the systems using nastran and a known (x only) load. 
-#3. Analyze the systems using nastran and a known (y only) load. 
-#4. Use the known load and the stress response to generate coefficients for x and y directions. 
-#5. Using these coefficients as input to Dr. Hou's algorithm, find the variance and mean of the stress response given the mean and variance of the applied load. 
-
-
 class Ind(object):
     def __init__(self, props, sys_num):
         self.props = props
