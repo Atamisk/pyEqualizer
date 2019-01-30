@@ -14,8 +14,8 @@ from copy import deepcopy
 from numpy import array,trace
 from multiprocessing.pool import Pool
 import random
-import lhsmdu
 import math
+import msslhs
 
 class Ind(object):
     def __init__(self, props, sys_num):
@@ -227,7 +227,7 @@ class system (object):
         """
         props = []
         lhs_exp = make_linear_map(0,250)
-        lhs_vals = lhsmdu.sample(len(self.base_props),self.n_org,randomSeed=random.randint(0,2**32-1)).tolist()
+        lhs_vals = msslhs.sample(len(self.base_props),self.n_org,1)[0].transpose().tolist()
         for x in range(self.n_org):
             org = self.base_props
             for i in range(len(org)):
