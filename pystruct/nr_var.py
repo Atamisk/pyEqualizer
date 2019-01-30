@@ -15,4 +15,7 @@ class nr_var(object):
     @property
     def mu(self):
         return deepcopy(self._mu)
+    @property
+    def list(self):
+        return [self.mu, self.sigma]
 

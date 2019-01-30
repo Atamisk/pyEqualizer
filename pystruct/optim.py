@@ -376,7 +376,7 @@ class tensor_ind(Ind):
         self.max_stress = -1
         self.target_elements = [100,106,219,220,221,222,277,301,575,711,712,713,744,745,824]
 
-    def apply_stochastic_force(self, mu_x, mu_y, sigma_x, sigma_y):
+    def apply_stochastic_force(self, sto_force_x, sto_force_y):
         """
         Apply a stochasticallay defined force. 
         Inputs: 
@@ -387,6 +387,8 @@ class tensor_ind(Ind):
         Outputs:
             out: State of stress at each tensor. 
         """
+        mu_x, sigma_x = sto_force_x.list
+        mu_y, sigma_y = sto_force_y.list
         out = []
         def get_stress_from_index(i):
            s_x = self.x_tensors[i] * (self.x_force**-1)
@@ -446,7 +448,6 @@ class system_unit(system):
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
               x_force, y_force, sto_force_x, sto_force_y, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran"):
-        #TODO: Rejigger this constructor to take stochastic force definitions. Maybe as an object?
         """
         Initializes the class with the passed in parameters. 
         
@@ -467,6 +468,8 @@ class system_unit(system):
             [], [], prefix, binary)
         self._x_force = x_force
         self._y_force = y_force
+        self._sto_force_x = sto_force_x
+        self._sto_force_y = sto_force_y
 
     @property
     def x_force(self):
@@ -474,6 +477,13 @@ class system_unit(system):
     @property
     def y_force(self):
         return self._y_force
+    
+    @property
+    def sto_force_x(self):
+        return self._sto_force_x
+    @property
+    def sto_force_y(self):
+        return self._sto_force_y
 
     @property
     def x_applied_force(self):
