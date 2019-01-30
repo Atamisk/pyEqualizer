@@ -1,2 +1,4 @@
 def calc_beta(stress, strength):
-    return 1
+    top = strength.mu - stress.mu
+    bottom = (stress.sigma + strength.sigma)**0.5
+    return top/bottom

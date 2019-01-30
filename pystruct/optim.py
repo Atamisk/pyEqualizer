@@ -441,7 +441,7 @@ class tensor_ind(Ind):
         return deepcopy(self._mass)
     @property
     def fitness(self):
-        return [self.mass, self.min_beta]
+        return [self.mass, -1*self.min_beta]
     #  For right now, this is here for compatibility. Future 
     # releases will have these two values differ. 
     fitness_unconst = fitness
