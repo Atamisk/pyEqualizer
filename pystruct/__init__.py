@@ -210,7 +210,7 @@ def gen_case(args, force_func, val_func):
     val_func_closed = lambda x: val_func(x, starting_force, fname, MAX_WT, MAX_STRESS)
     prepare_report(all_front, val_func_closed, systems)
 
-def optimize_systems(systems, N_GEN):
+def optimize_systems(systems, N_GEN, compact=False):
     """
     Main optimization loop for the program. 
     Inputs:
@@ -248,6 +248,9 @@ def optimize_systems(systems, N_GEN):
         #Plot results of this system
         front = isolate_pareto(latest_vec)
         _ , _ = plot_with_front(latest_vec, front, 'System {}'.format(str(x)) ,'/tmp/output_sys_' + str(x) + '.png')
+        if (compact):
+            for x in front:
+                x.strip_tensors()
         all_front.append(front)
     return all_front
 

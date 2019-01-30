@@ -420,7 +420,9 @@ class tensor_ind(Ind):
         for i in range(len(target_elements)):
             out.append( all_tensors[i][0]  * (x_appforce / self.x_force) + all_tensors[i][1] * (y_appforce / self.y_force))
         return out
-
+    def strip_tensors(self):
+        self._x_tensors = "STRIPPED"
+        self._y_tensors = "STRIPPED"
     @property
     def x_tensors(self):
         return deepcopy(self._x_tensors)
