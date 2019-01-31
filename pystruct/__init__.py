@@ -286,7 +286,7 @@ def prepare_report(all_front, val_func, systems):
     ax.legend()
     ax.set_title('All Fronts')
     ax.set_xlabel('Weight(kg)');
-    ax.set_ylabel('Stress(MPa)');
+    ax.set_ylabel('Beta(unitless)');
     #Save Plot
     fig.savefig('/tmp/all_fronts.png')
 
