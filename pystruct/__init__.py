@@ -10,7 +10,6 @@ import random
 from time import time
 import argparse
 import msslhs
-
 def test_open_force_pack(f, n1,n2,n3):
     """
     Make a force pack compliant with the master's project force input. 
@@ -220,6 +219,24 @@ def optimize_systems(systems, N_GEN, compact=False):
       all_front -- A sorted list of pareto fronts from each system, presented as an
                    array of arrays of pystruct.optim.Ind objects. 
     """
+    def gen_loop(x,i, last_vec):
+        print("Generation {} in system {} starting at T+ {:.3f}".format(i, x, time()-start_time))
+        latest_vec = main_sys.trial_generation(last_vec)
+        latest_props = [a.props for a in latest_vec]
+        latest_cost = [a.fitness[0] for a in latest_vec]
+        min_cost = min(latest_cost)
+
+        #If any cost values come out to be zero, complain. 
+        if min(latest_cost) == 0:
+            s = "One or more cost values are zero.\n"
+            min_index = latest_cost.index(min_cost)
+            min_prop = latest_props[min_index]
+            s += "At index {}\n".format(min_index)
+            for x in min_prop:
+                s += "{}\n".format(str(x))
+            raise ValueError(s)
+        print("Generation {} in system {} complete at T+ {:.3f}\n".format(i, x, time()-start_time))
+        return latest_vec
     print("Analysis Started.")
     start_time = time()
     all_front = []
@@ -228,23 +245,7 @@ def optimize_systems(systems, N_GEN, compact=False):
         main_sys = systems[x]
         latest_vec = main_sys.first_generation()
         for i in range(N_GEN):
-            print("Generation {} in system {} starting at T+ {:.3f}".format(i, x, time()-start_time))
-            latest_vec = main_sys.trial_generation(latest_vec)
-            latest_props = [a.props for a in latest_vec]
-            latest_cost = [a.fitness[0] for a in latest_vec]
-            min_cost = min(latest_cost)
-
-            #If any cost values come out to be zero, complain. 
-            if min(latest_cost) == 0:
-                s = "One or more cost values are zero.\n"
-                min_index = latest_cost.index(min_cost)
-                min_prop = latest_props[min_index]
-                s += "At index {}\n".format(min_index)
-                for x in min_prop:
-                    s += "{}\n".format(str(x))
-                raise ValueError(s)
-            print("Generation {} in system {} complete at T+ {:.3f}\n".format(i, x, time()-start_time))
-
+            latest_vec = gen_loop(x,i,latest_vec)
         #Plot results of this system
         front = isolate_pareto(latest_vec)
         _ , _ = plot_with_front(latest_vec, front, 'System {}'.format(str(x)) ,'/tmp/output_sys_' + str(x) + '.png')

@@ -530,6 +530,7 @@ class system_unit(system):
         pool = Pool(8)
         args_to_pool = [ [x, self.sto_force_x, self.sto_force_y] for x in inds]
         app = pool.starmap(self.call_apply, args_to_pool)
+        pool.terminate()
         return app
         
 

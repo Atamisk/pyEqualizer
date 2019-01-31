@@ -185,6 +185,7 @@ def run_nastran(nastr_bin, files):
         res.append(processes.apply_async(call_nas, (f,)))
     processes.close()
     processes.join()
+    processes.terminate()
         #sleep(3)
 
 def skipline(f,n):
