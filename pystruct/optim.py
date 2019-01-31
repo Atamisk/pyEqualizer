@@ -435,8 +435,8 @@ class tensor_ind(Ind):
     @property
     def fitness(self):
         if self.mass > 1000:
-            massout = 1.e6 * self.mass
-            betaout = 1.e-6 * self.min_beta
+            massout = 1.e6 * self.mass**2
+            betaout = -1.e6 * self.min_beta * self.mass
         else:
             massout = self.mass
             betaout = self.min_beta
