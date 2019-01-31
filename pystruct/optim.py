@@ -434,10 +434,15 @@ class tensor_ind(Ind):
         return deepcopy(self._mass)
     @property
     def fitness(self):
-        return [self.mass, -1*self.min_beta]
+        if self.mass > 1000:
+            massout = 1.e4 * self.mass
+        else:
+            massout = self.mass
+        return [massout, -1*self.min_beta]
     #  For right now, this is here for compatibility. Future 
     # releases will have these two values differ. 
-    fitness_unconst = fitness
+    def fitness_unconst(self):
+        return [self.mass, -1*self.min_beta]
 class system_unit(system):
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
