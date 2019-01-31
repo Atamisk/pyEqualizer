@@ -435,13 +435,15 @@ class tensor_ind(Ind):
     @property
     def fitness(self):
         if self.mass > 1000:
-            massout = 1.e4 * self.mass
+            massout = 1.e6 * self.mass
+            betaout = 1.e-6 * self.min_beta
         else:
             massout = self.mass
-        return [massout, -1*self.min_beta]
+            betaout = self.min_beta
+        return [massout, -1*betaout]
     @property
     def fitness_unconst(self):
-        return [self.mass, -1*self.min_beta]
+        return [self.mass, self.min_beta]
 class system_unit(system):
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
