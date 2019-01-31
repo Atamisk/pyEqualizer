@@ -506,7 +506,7 @@ class system_unit(system):
         props = prop_func(last_props)
         out = self.get_tensors_from_props(props)
         all_str = self.apply_forces(out)
-        strength = nr_var(36000, 36000*0.13)
+        strength = nr_var(248.211, 248.211*0.13)
         for x in range(len(out)):
             out[x].min_beta = min([calc_beta(y, strength) for y in all_str[x]])
         return out
