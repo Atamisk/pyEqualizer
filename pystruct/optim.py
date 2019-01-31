@@ -439,8 +439,7 @@ class tensor_ind(Ind):
         else:
             massout = self.mass
         return [massout, -1*self.min_beta]
-    #  For right now, this is here for compatibility. Future 
-    # releases will have these two values differ. 
+    @property
     def fitness_unconst(self):
         return [self.mass, -1*self.min_beta]
 class system_unit(system):
