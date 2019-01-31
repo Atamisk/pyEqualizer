@@ -109,7 +109,7 @@ def plot_inds(ax, inds, lab):
     [pt_x, pt_y] = get_plot_pts(inds)
     ax.scatter(pt_x, pt_y, label=lab)
     ax.set_xlabel('Weight(kg)');
-    ax.set_ylabel('Stress(MPa)');
+    ax.set_ylabel('Beta(unitless)');
 
 def plot_with_front(gen, front, title, fname):
     """
