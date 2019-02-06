@@ -434,13 +434,13 @@ class tensor_ind(Ind):
         return deepcopy(self._mass)
     @property
     def fitness(self):
-        if self.mass > 1000:
-            massout = 1.e6 * self.mass**2
-            betaout = -1.e6 * self.min_beta * self.mass
+        viol = 1 + min(1000 - self.mass, 0) * -10**4
+        massout = viol*self.mass
+        if viol == 1:
+            betaout = -1*self.min_beta
         else:
-            massout = self.mass
-            betaout = self.min_beta
-        return [massout, -1*betaout]
+            betaout = viol - self.min_beta
+        return [massout, betaout]
     @property
     def fitness_unconst(self):
         return [self.mass, self.min_beta]
