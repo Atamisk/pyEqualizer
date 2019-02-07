@@ -10,6 +10,8 @@ import random
 from time import time
 import argparse
 import msslhs
+import pickle
+
 def test_open_force_pack(f, n1,n2,n3):
     """
     Make a force pack compliant with the master's project force input. 
@@ -128,6 +130,10 @@ def plot_with_front(gen, front, title, fname):
     ax.set_title(title)
     ax.legend()
     fig.savefig(fname)
+    fname_pickle = fname[:-3] + "pickle"
+    with open(fname_pickle, 'wb') as f:
+        pickle.dump(gen, f)
+        pickle.dump(front, f)
     return [fig, ax]
 
 def no_validate(inds, val_force, fname, max_wt, max_stress):
