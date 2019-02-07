@@ -130,10 +130,6 @@ def plot_with_front(gen, front, title, fname):
     ax.set_title(title)
     ax.legend()
     fig.savefig(fname)
-    fname_pickle = fname[:-3] + "pickle"
-    with open(fname_pickle, 'wb') as f:
-        pickle.dump(gen, f)
-        pickle.dump(front, f)
     return [fig, ax]
 
 def no_validate(inds, val_force, fname, max_wt, max_stress):
@@ -254,7 +250,10 @@ def optimize_systems(systems, N_GEN, compact=False):
             latest_vec = gen_loop(x,i,latest_vec)
         #Plot results of this system
         front = isolate_pareto(latest_vec)
-        _ , _ = plot_with_front(latest_vec, front, 'System {}'.format(str(x)) ,'/tmp/output_sys_' + str(x) + '.png')
+        fig , ax = plot_with_front(latest_vec, front, 'System {}'.format(str(x)) ,'/tmp/output_sys_' + str(x) + '.png')
+        with open('/tmp/output_sys_' + str(x) + '.pickle', 'wb') as f:
+            pickle.dump(fig,f)
+            pickle.dump(ax,f)
         if (compact):
             for x in front:
                 x.strip_tensors()
