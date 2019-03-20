@@ -165,6 +165,22 @@ def print_ind(ind):
     print("    Max Stress:\t\t\t\t{:4.2e} MPa".format(float(ind.fitness_unconst[1])))
     print("    Weight:\t\t\t\t{:4.2e} kg".format(float(ind.fitness_unconst[0])))
 
+def print_ind_csv(ind):
+    """
+    Compactly print an individual.
+    """
+    def prcomma(inStr):
+        print(inStr, end=',')
+    prcomma((ind.sys_num))
+    prcomma((float(ind.props[0][3])))
+    prcomma((float(ind.props[1][3])))
+    prcomma((float(ind.props[2][3])))
+    prcomma((float(ind.props[3][3])))
+    prcomma((float(ind.props[4][3])))
+    prcomma((float(ind.fitness_unconst[1])))
+    print((float(ind.fitness_unconst[0])))
+
+
 def print_load_case(sys,case_num):
     lc = sys.base_force
     print("Load Case {}".format(case_num))
@@ -184,6 +200,7 @@ def parseargs():
         parser.add_argument('--max_wt', '-w', type=int, default=1000, help='Maximum Weight Desired' )
         parser.add_argument('--max_stress', '-t', type=int, default=95.3, help='Maximum Stress Desired')
         parser.add_argument('--special' ,'-S' ,help='Perform special case NUM', type=int)
+        parser.add_argument('--csv',default=False, action='store_true', help='Output final systems as a CSV file.')
         parser.add_argument('fname') 
         args = parser.parse_args()
         return args
@@ -209,7 +226,10 @@ def gen_case(args, force_func, val_func):
 
     all_front = optimize_systems(systems, N_GEN)
     val_func_closed = lambda x: val_func(x, starting_force, fname, MAX_WT, MAX_STRESS)
-    prepare_report(all_front, val_func_closed, systems)
+    if (args.csv == False):
+        prepare_report_pretty(all_front, val_func_closed, systems)
+    else:
+        prepare_report_csv(all_front, val_func_closed, systems)
 
 def optimize_systems(systems, N_GEN, compact=False):
     """
@@ -260,7 +280,13 @@ def optimize_systems(systems, N_GEN, compact=False):
         all_front.append(front)
     return all_front
 
-def prepare_report(all_front, val_func, systems):
+def prepare_report_pretty(all_front, val_func, systems):
+    prepare_report(all_front, val_func, systems, print_pretty)
+def prepare_report_csv(all_front, val_func, systems):
+    prepare_report(all_front, val_func, systems, print_csv)
+
+
+def prepare_report(all_front, val_func, systems, print_func):
     #Gather all fronts combined. 
     all_front_mixed = []
     for x in all_front:
@@ -303,9 +329,16 @@ def prepare_report(all_front, val_func, systems):
         print_load_case(systems[x],x)
     print("\nSummary of valid designs:")
     print(  "--------------------------")
+    print_func(final_front)
+
+def print_pretty(final_front):
     for x in range(len(final_front)):
         print("System {}".format(x))
         print_ind(final_front[x])
+def print_csv(final_front):
+    print("Parent Load Case,Top Flange Width,Bottom Flange Width,Web Thickness,Doubler Thickness at Hoist Pin,Doubler Thickness at Load Pin,Fitness 1, Fitness 2")
+    for x in range(len(final_front)):
+        print_ind_csv(final_front[x])
 
 def det_run(args):
     """
@@ -361,7 +394,10 @@ def loc_run(args):
                x_force, y_force, sto_force_x, sto_force_y)]
     all_front = optimize_systems(systems, N_GEN)
     val_closed = lambda x: no_validate(x,[],[],[],[])
-    prepare_report(all_front, val_closed, systems)
+    if (args.csv == False):
+        prepare_report_pretty(all_front, val_closed, systems)
+    else:
+        prepare_report_csv(all_front, val_closed, systems)
 def main():
     args = parseargs()
     if args.special:
