@@ -30,7 +30,7 @@ class cd:
 
 def to_nas_real(number):
     try:
-        exponent = floor(log(number,10))
+        exponent = floor(log(abs(number),10))
     except ValueError as e: 
         #We probably passed zero into the function. Assume exponent is 1. 
         exponent = 1
