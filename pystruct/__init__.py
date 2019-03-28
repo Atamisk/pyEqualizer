@@ -83,7 +83,7 @@ def normal_random_force(base_forces, n, mu_force, sigma_force, mu_angle, sigma_a
 def rnd_to_actual(force, angle):
     force_vert = force * math.cos(angle)
     force_horiz = force * math.sin(angle)
-    return [force_horiz, force_vert]
+    return [force_horiz, -force_vert]
 
 def random_force_base(base_forces, rand_vals, n):
     """
