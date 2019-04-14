@@ -31,24 +31,24 @@ def mc_vm_stress(px, py):
 
 
 # Establish the Random Variables: 
-mean_px = 150
-std_px = 19.5
-px = nr_var(mean_px, std_px)
-
-mean_py = 25
-std_py = 3.25
+mean_py = 150
+std_py = 19.5
 py = nr_var(mean_py, std_py)
+
+mean_px = 25
+std_px = 3.25
+px = nr_var(mean_px, std_px)
 
 # Get the sample vectors to operate on: 
 mc_vec_px = normal(px.mu, px.sigma, n)
-mc_vec_py = normal(px.mu, px.sigma, n)
+mc_vec_py = normal(py.mu, py.sigma, n)
 mc_vec_s_vm = [mc_vm_stress(mc_vec_px[i], mc_vec_py[i]) for i in range(n)]
 
 #Run the sim
 mc_mean = mean(mc_vec_s_vm)
 mc_std = std(mc_vec_s_vm)
-print("Mean according to MC Simulation:          {}".format(mc_mean))
-print("St. Deviation according to MC Simulation: {}".format(mc_std))
+print("Mean according to MC Simulation:          {:.4e}".format(mc_mean))
+print("St. Deviation according to MC Simulation: {:.4e}".format(mc_std))
            
 def get_taylor_vm(px, py):
     mu_x, sigma_x = px.list
@@ -59,23 +59,24 @@ def get_taylor_vm(px, py):
     sd_y = s_y.deviator
     alpha = ((sd_x@sd_x)*mu_x**2 + ((sd_x @ sd_y) + (sd_y @ sd_x)) * mu_x * mu_y
             + (sd_y @ sd_y) * mu_y**2).trace()
+    al = ((sd_x * mu_x + sd_y * mu_y))
     fd_alpha_px = ((sd_x@sd_x)*2*mu_x + ((sd_x @ sd_y) + (sd_y @ sd_x)) * mu_y).trace()
     sd_alpha_px = ((sd_x@sd_x)*2).trace()
     fd_alpha_py = (((sd_x @ sd_y) + (sd_y @ sd_x)) * mu_x + (sd_y @ sd_y) * 2 * mu_y).trace()
     sd_alpha_py = ((sd_y @ sd_y) * 2).trace()
 
     s_vm = (3/2*alpha)**0.5
-    fd_svm_px = (3/4) * (3/2*alpha)**-0.5 * fd_alpha_px
-    sd_svm_px = ((3/4) * sd_alpha_px * (3/2 * alpha)**-0.5) + ((-9/16) * (3/2*alpha)**(-3/2) * fd_alpha_px**2)
-    fd_svm_py = (3/4) * (3/2*alpha)**-0.5 * fd_alpha_py
-    sd_svm_py = ((3/4) * sd_alpha_py * (3/2 * alpha)**-0.5) + ((-9/16) * (3/2*alpha)**(-3/2) * fd_alpha_py**2)
-
-    E_svm = s_vm + (1.2) * (sd_svm_px * sigma_x**2 + sd_svm_py * sigma_y**2)
+    fd_svm_px = (3/2)**0.5 * ((1/2) * (alpha)**-0.5 * fd_alpha_px)
+    sd_svm_px = (3/2)**0.5 * (((1/2) * sd_alpha_px * (alpha)**-0.5) + ((-1/4) * (alpha)**(-3/2) * fd_alpha_px**2))
+    fd_svm_py = (3/2)**0.5 * ((1/2) * (alpha)**-0.5 * fd_alpha_py)
+    sd_svm_py = (3/2)**0.5 * (((1/2) * sd_alpha_py * (alpha)**-0.5) + ((-1/4) * (alpha)**(-3/2) * fd_alpha_py**2))
+    E_svm = s_vm + (1/2) * (sd_svm_px * sigma_x**2 + sd_svm_py * sigma_y**2)
     sigma_svm = (((fd_svm_px * sigma_x)**2) + ((fd_svm_py * sigma_y)**2) + ((1/4) * ((sd_svm_px * sigma_x**2)**2 + 
                        (sd_svm_py * sigma_y**2)**2)))**0.5
     return nr_var(E_svm, sigma_svm)
 
 taylor_stats = get_taylor_vm(px,py)
-print("Mean according to Taylor Approximation:          {}".format(taylor_stats.mu))
-print("St. Deviation according to Taylor Approximation: {}".format(taylor_stats.sigma))
-print(mc_mean/taylor_stats.mu)
+print("Mean according to Taylor Approximation:          {:.4e}".format(taylor_stats.mu))
+print("St. Deviation according to Taylor Approximation: {:.4e}".format(taylor_stats.sigma))
+print("Error (Mean): {:.4e}%".format((mc_mean - taylor_stats.mu)/ mc_mean*100.))
+print("Error (Standard Deviation): {:.4e}%".format((mc_std - taylor_stats.sigma)/ mc_std*100.))

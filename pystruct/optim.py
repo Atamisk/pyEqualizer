@@ -395,12 +395,12 @@ class tensor_ind(Ind):
            sd_alpha_py = ((sd_y @ sd_y) * 2).trace()
 
            s_vm = (3/2*alpha)**0.5
-           fd_svm_px = (3/4) * (3/2*alpha)**-0.5 * fd_alpha_px
-           sd_svm_px = ((3/4) * sd_alpha_px * (3/2 * alpha)**-0.5) + ((-9/16) * (3/2*alpha)**(-3/2) * fd_alpha_px**2)
-           fd_svm_py = (3/4) * (3/2*alpha)**-0.5 * fd_alpha_py
-           sd_svm_py = ((3/4) * sd_alpha_py * (3/2 * alpha)**-0.5) + ((-9/16) * (3/2*alpha)**(-3/2) * fd_alpha_py**2)
+           fd_svm_px = (3/2)**0.5 * ((1/2) * (alpha)**-0.5 * fd_alpha_px)
+           sd_svm_px = (3/2)**0.5 * (((1/2) * sd_alpha_px * (alpha)**-0.5) + ((-1/4) * (alpha)**(-3/2) * fd_alpha_px**2))
+           fd_svm_py = (3/2)**0.5 * ((1/2) * (alpha)**-0.5 * fd_alpha_py)
+           sd_svm_py = (3/2)**0.5 * (((1/2) * sd_alpha_py * (alpha)**-0.5) + ((-1/4) * (alpha)**(-3/2) * fd_alpha_py**2))
 
-           E_svm = s_vm + (1.2) * (sd_svm_px * sigma_x**2 + sd_svm_py * sigma_y**2)
+           E_svm = s_vm + (1/2) * (sd_svm_px * sigma_x**2 + sd_svm_py * sigma_y**2)
            sigma_svm = (((fd_svm_px * sigma_x)**2) + ((fd_svm_py * sigma_y)**2) + ((1/4) * ((sd_svm_px * sigma_x**2)**2 + 
                        (sd_svm_py * sigma_y**2)**2)))**0.5
            return nr_var(E_svm, sigma_svm)
