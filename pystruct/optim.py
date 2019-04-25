@@ -111,7 +111,8 @@ def fold_in_force(props, force):
     fold_in_force(props, vec): Fold the force set for a system into the properties for a generation. 
 
     Parameters: 
-    props: A vector representing a generation of individuals. In effect, an array of arrays of property cards. 
+    props: A vector representing a generation of individuals. 
+           In effect, an array of arrays of property cards. 
     force: A set of FORCE card entries. 
     """
     props_cpy = deepcopy(props)
@@ -144,7 +145,8 @@ class system (object):
     CR = 0.45
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
-            fitness_funcs, const_funcs, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran", force = []):
+            fitness_funcs, const_funcs, prefix = "/tmp/nastran/optim", 
+            binary = "/usr/bin/nastran", force = []):
         """ 
         Initialize the system class.
         
@@ -321,7 +323,8 @@ class system (object):
 
     def run_generation(self, prop_func, last_props):
         """
-        first_generation(): Run a single generation of the optimiser, stopping at the fitness function generation. 
+        first_generation(): Run a single generation of the optimiser, 
+                            stopping at the fitness function generation. 
 
         Arguments: 
         prop_func: Function that determines the population of the current generation. 
@@ -396,13 +399,15 @@ class tensor_ind(Ind):
 
            s_vm = (3/2*alpha)**0.5
            fd_svm_px = (3/2)**0.5 * ((1/2) * (alpha)**-0.5 * fd_alpha_px)
-           sd_svm_px = (3/2)**0.5 * (((1/2) * sd_alpha_px * (alpha)**-0.5) + ((-1/4) * (alpha)**(-3/2) * fd_alpha_px**2))
+           sd_svm_px = ((3/2)**0.5 * (((1/2) * sd_alpha_px * (alpha)**-0.5) + 
+               ((-1/4) * (alpha)**(-3/2) * fd_alpha_px**2)))
            fd_svm_py = (3/2)**0.5 * ((1/2) * (alpha)**-0.5 * fd_alpha_py)
-           sd_svm_py = (3/2)**0.5 * (((1/2) * sd_alpha_py * (alpha)**-0.5) + ((-1/4) * (alpha)**(-3/2) * fd_alpha_py**2))
+           sd_svm_py = ((3/2)**0.5 * (((1/2) * sd_alpha_py * (alpha)**-0.5) + 
+               ((-1/4) * (alpha)**(-3/2) * fd_alpha_py**2)))
 
            E_svm = s_vm + (1/2) * (sd_svm_px * sigma_x**2 + sd_svm_py * sigma_y**2)
-           sigma_svm = (((fd_svm_px * sigma_x)**2) + ((fd_svm_py * sigma_y)**2) + ((1/4) * ((sd_svm_px * sigma_x**2)**2 + 
-                       (sd_svm_py * sigma_y**2)**2)))**0.5
+           sigma_svm = (((fd_svm_px * sigma_x)**2) + ((fd_svm_py * sigma_y)**2) + 
+                   ((1/4) * ((sd_svm_px * sigma_x**2)**2 + (sd_svm_py * sigma_y**2)**2)))**0.5
            return nr_var(E_svm, sigma_svm)
            
         for i in self.target_elements:
@@ -418,7 +423,8 @@ class tensor_ind(Ind):
         out = []
         all_tensors = [[self.x_tensors[i], self.y_tensors[i]] for i in target_elements]
         for i in range(len(target_elements)):
-            out.append( all_tensors[i][0]  * (x_appforce / self.x_force) + all_tensors[i][1] * (y_appforce / self.y_force))
+            out.append( all_tensors[i][0]  * (x_appforce / self.x_force) +
+                    all_tensors[i][1] * (y_appforce / self.y_force))
         return out
     def strip_tensors(self):
         self._x_tensors = "STRIPPED"
@@ -447,7 +453,8 @@ class tensor_ind(Ind):
 class system_unit(system):
 
     def __init__(self, sys_num, fname, n_gen, n_org, 
-              x_force, y_force, sto_force_x, sto_force_y, prefix = "/tmp/nastran/optim", binary = "/usr/bin/nastran"):
+              x_force, y_force, sto_force_x, sto_force_y, prefix = "/tmp/nastran/optim", 
+              binary = "/usr/bin/nastran"):
         """
         Initializes the class with the passed in parameters. 
         
@@ -497,7 +504,8 @@ class system_unit(system):
     #    pass
     def run_generation(self, prop_func, last_props):
         """
-        run_generation(): Run a single generation of the optimiser, stopping at the fitness function generation. 
+        run_generation(): Run a single generation of the optimiser, 
+                          stopping at the fitness function generation. 
 
         Arguments: 
         prop_func: Function that determines the population of the current generation. 
@@ -563,7 +571,8 @@ class system_unit(system):
                 stresses = stress_all_point(f)
                 file_tensors = []
                 for x in stresses:
-                    file_tensors.append(stress_tensor(float(x[0]),float(x[1]), 0, float(x[2]), 0, 0))
+                    file_tensors.append(stress_tensor(float(x[0]),
+                        float(x[1]), 0, float(x[2]), 0, 0))
                 tensors.append(file_tensors)
             return [tensors, f06_names]
         # Get system mass.
@@ -572,7 +581,8 @@ class system_unit(system):
         masses = [mass(f) for f in f06_names]
         inds_with_tensors = []
         for i in range(len(props)):
-            inds_with_tensors.append(tensor_ind(props[i], self.sys_num, self.x_force, self.y_force, x_tensors[i], y_tensors[i], masses[i]))
+            inds_with_tensors.append(tensor_ind(props[i], self.sys_num, self.x_force, self.y_force, 
+                x_tensors[i], y_tensors[i], masses[i]))
         return inds_with_tensors  
 
     def split_force_pack(self):

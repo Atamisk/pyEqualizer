@@ -77,7 +77,8 @@ def normal_random_force(base_forces, n, mu_force, sigma_force, mu_angle, sigma_a
             vals = rnd_to_actual(conv_force(rand_vals_norm[0][x]), conv_angle(rand_vals_norm[1][x]))
             rand_vals_out[0].append(vals[0])
             rand_vals_out[1].append(vals[1])
-    print("Of {} generated systems, {} meet the minimum force criterion.".format(n, len(rand_vals_out[0])))
+    print("Of {} generated systems, {} meet the minimum force criterion.".format
+            (n, len(rand_vals_out[0])))
     return random_force_base(base_forces, rand_vals_out, n)
 
 def rnd_to_actual(force, angle):
@@ -194,13 +195,19 @@ def parseargs():
     """
     try:
         parser = argparse.ArgumentParser(description='Differentially optimize a better spreader beam')
-        parser.add_argument('--n_gen', '-g', type=int, default=5, help='Number of Simulation Generations')
-        parser.add_argument('--n_ind', '-i', type=int, default=15, help='Number of Simulation Individuals') 
-        parser.add_argument('--n_sys', '-s', type=int, default=5, help='Number of Simulation Systems')
-        parser.add_argument('--max_wt', '-w', type=int, default=1000, help='Maximum Weight Desired' )
-        parser.add_argument('--max_stress', '-t', type=int, default=95.3, help='Maximum Stress Desired')
+        parser.add_argument('--n_gen', '-g', type=int, default=5, 
+                help='Number of Simulation Generations')
+        parser.add_argument('--n_ind', '-i', type=int, default=15, 
+                help='Number of Simulation Individuals') 
+        parser.add_argument('--n_sys', '-s', type=int, default=5, 
+                help='Number of Simulation Systems')
+        parser.add_argument('--max_wt', '-w', type=int, default=1000, 
+                help='Maximum Weight Desired' )
+        parser.add_argument('--max_stress', '-t', type=int, default=95.3, 
+                help='Maximum Stress Desired')
         parser.add_argument('--special' ,'-S' ,help='Perform special case NUM', type=int)
-        parser.add_argument('--csv',default=False, action='store_true', help='Output final systems as a CSV file.')
+        parser.add_argument('--csv',default=False, action='store_true', 
+                help='Output final systems as a CSV file.')
         parser.add_argument('fname') 
         args = parser.parse_args()
         return args
@@ -270,7 +277,8 @@ def optimize_systems(systems, N_GEN, compact=False):
             latest_vec = gen_loop(x,i,latest_vec)
         #Plot results of this system
         front = isolate_pareto(latest_vec)
-        fig , ax = plot_with_front(latest_vec, front, 'System {}'.format(str(x)) ,'/tmp/output_sys_' + str(x) + '.png')
+        fig , ax = plot_with_front(latest_vec, front, 'System {}'.format(str(x)) 
+                ,'/tmp/output_sys_' + str(x) + '.png')
         with open('/tmp/output_sys_' + str(x) + '.pickle', 'wb') as f:
             pickle.dump(fig,f)
             pickle.dump(ax,f)
@@ -336,7 +344,8 @@ def print_pretty(final_front):
         print("System {}".format(x))
         print_ind(final_front[x])
 def print_csv(final_front):
-    print("Parent Load Case,Top Flange Width,Bottom Flange Width,Web Thickness,Doubler Thickness at Hoist Pin,Doubler Thickness at Load Pin,Fitness 1, Fitness 2")
+    print("Parent Load Case,Top Flange Width,Bottom Flange Width,Web Thickness," + 
+            "Doubler Thickness at Hoist Pin,Doubler Thickness at Load Pin,Fitness 1, Fitness 2")
     for x in range(len(final_front)):
         print_ind_csv(final_front[x])
 
@@ -369,7 +378,7 @@ def dwu_run(args):
     print("DWU Run selected.")
     args_out = deepcopy(args)
     args_out.n_sys = 1000
-    nrf_closed = lambda x,y: normal_random_force(x, y, 150000, 20670, 0, 0.087) #Fix angle and force parameters per our e-mail. 
+    nrf_closed = lambda x,y: normal_random_force(x, y, 150000, 20670, 0, 0.087)
     gen_case(args_out, nrf_closed, no_validate)
 
 
