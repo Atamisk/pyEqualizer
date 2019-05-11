@@ -10,7 +10,7 @@ _valid_entries = ["PBAR", "PSHELL"]
 import sys
 from copy import deepcopy
 from subprocess import Popen,call
-from pystruct.stress_tensor import stress_tensor
+from pyequalizer.stress_tensor import stress_tensor
 from multiprocessing.pool import ThreadPool
 from time import sleep
 from math import *

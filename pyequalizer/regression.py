@@ -1,13 +1,13 @@
 from scipy.optimize import curve_fit
 from numpy import ndarray
-from pystruct.optim import *
+from pyequalizer.optim import *
 from copy import deepcopy
 
 def find_line(front):
     """
     find_line(front): Find a rational regression line between the stress and strain values of a set of pareto fronts. 
     Parameters: 
-    front: A list of pystruct.optim.Individuals that define the pareto front. 
+    front: A list of pyequalizer.optim.Individuals that define the pareto front. 
     """
     sct_x, sct_y = get_plot_pts(front)
     def ratline(x, c, e, h, eps):
@@ -43,7 +43,7 @@ def get_closest(inds, reg):
     to the previously generated regression line. 
 
     Arguments: 
-        * inds: An array of Inds as defined in pystruct.optim. 
+        * inds: An array of Inds as defined in pyequalizer.optim. 
         * reg: A regression line. Function taking on numeric argument and 
                returning a numeric result. 
     """

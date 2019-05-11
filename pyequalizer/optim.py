@@ -7,9 +7,9 @@
   Author: Aaron Moore
   Date:   2018-07-12
 """
-from pystruct.fileops import *
-from pystruct.nr_var import *
-from pystruct.math_utils import *
+from pyequalizer.fileops import *
+from pyequalizer.nr_var import *
+from pyequalizer.math_utils import *
 from copy import deepcopy
 from numpy import array,trace
 from multiprocessing.pool import Pool
@@ -66,10 +66,9 @@ def compare_all(trial, chall, comp):
     """
     dominates(trial, chall): Return true if the challenger dominates the trial organism
     """
-    for t,c in zip(trial[1], chall[1]):
-        if comp(t,c):
-            return False
-    return True
+    t,c = [trial[1], chall[1]]
+    compval = any(map(comp,t,c)) #If any of the comparison functions return true, return true overall. 
+    return not compval
 
 def dominates(trial, chall):
     return compare_all(trial, chall, lambda x,y: x < y)

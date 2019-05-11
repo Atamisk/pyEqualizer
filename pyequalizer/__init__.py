@@ -1,8 +1,8 @@
-from pystruct.fileops import *
-from pystruct.optim import *
-from pystruct.regression import *
-from pystruct.nr_var import *
-from pystruct.nas_utils import *
+from pyequalizer.fileops import *
+from pyequalizer.optim import *
+from pyequalizer.regression import *
+from pyequalizer.nr_var import *
+from pyequalizer.nas_utils import *
 from matplotlib.pyplot import ioff, savefig, subplots
 from multiprocessing.pool import Pool
 import sys, getopt
@@ -242,11 +242,11 @@ def optimize_systems(systems, N_GEN, compact=False):
     """
     Main optimization loop for the program. 
     Inputs:
-      systems   -- List of pystruct.optim.system objects that make up the load cases to be analyzed.
+      systems   -- List of pyequalizer.optim.system objects that make up the load cases to be analyzed.
       N_GEN     -- Number of generations to run each optimization for.
     Output: 
       all_front -- A sorted list of pareto fronts from each system, presented as an
-                   array of arrays of pystruct.optim.Ind objects. 
+                   array of arrays of pyequalizer.optim.Ind objects. 
     """
     def gen_loop(x,i, last_vec):
         print("Generation {} in system {} starting at T+ {:.3f}".format(i, x, time()-start_time))

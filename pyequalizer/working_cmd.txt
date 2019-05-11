@@ -1,1 +1,1 @@
-py pystruct test.dat data\lel "C:\Program Files\Siemens\NXNastran\nxn10p2\bin\nastran64w.exe
+py pyequalizer test.dat data\lel "C:\Program Files\Siemens\NXNastran\nxn10p2\bin\nastran64w.exe

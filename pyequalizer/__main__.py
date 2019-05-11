@@ -1,3 +1,3 @@
-import pystruct
+import pyequalizer
 # Actual code to run...
-pystruct.main()
+pyequalizer.main()
