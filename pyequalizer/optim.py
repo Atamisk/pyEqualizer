@@ -83,12 +83,10 @@ def isolate_front(vec_ind, dom_func):
     """
     vec = [a.to_array() for a in vec_ind]
     def dominates_all(index):
-        ind = list(range(len(vec)))
-        ind.pop(index)
-        for i in ind:
-            if dom_func(vec[index], vec[i]) == True:
-                return False
-        return True
+        ind = deepcopy(vec)
+        target = ind.pop(index)
+        compval = any(map(lambda h: dom_func(target,h), ind))
+        return not compval
     front = []
     for i in range(len(vec)):
         if dominates_all(i):
