@@ -87,10 +87,7 @@ def isolate_front(vec_ind, dom_func):
         target = ind.pop(index)
         compval = any(map(lambda h: dom_func(target,h), ind))
         return not compval
-    front = []
-    for i in range(len(vec)):
-        if dominates_all(i):
-            front.append(vec_ind[i])
+    front = [vec_ind[x] for x in range(len(vec)) if dominates_all(x)]
     return front
 
 def isolate_pareto(vec):
@@ -112,11 +109,7 @@ def fold_in_force(props, force):
            In effect, an array of arrays of property cards. 
     force: A set of FORCE card entries. 
     """
-    props_cpy = deepcopy(props)
-    for x in props_cpy:
-        for y in force:
-            x.append(y)
-    return props_cpy
+    return [x + force for x in props]
 
 
 class system (object):
