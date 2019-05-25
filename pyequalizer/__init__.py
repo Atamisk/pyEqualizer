@@ -58,7 +58,9 @@ def const_mass(files):
 
 def converge_check_pareto_percentage(latest_front, last_front, latest_vec, i):
     threshold = 0.3
-    return True if len(latest_front)/len(latest_vec) > threshold else False
+    percentage = len(latest_front)/len(latest_vec)
+    print("CONVERGENCE PROGRESS: Threshold: {} Current: {}".format(threshold, percentage))
+    return True if percentage > threshold else False
 
 def uniform_random_force(base_forces, n):
     pre = msslhs.sample(len(base_forces)*2, n, 1)[0].transpose().tolist()
@@ -210,6 +212,7 @@ def parseargs():
         parser.add_argument('--max_stress', '-t', type=int, default=95.3, 
                 help='Maximum Stress Desired')
         parser.add_argument('--special' ,'-S' ,help='Perform special case NUM', type=int)
+        parser.add_argument('--convergence', '-C', help='Add convergence check NUM to the algorithm. Supported values: 1-pareto percentage convergence', type=int)
         parser.add_argument('--csv',default=False, action='store_true', 
                 help='Output final systems as a CSV file.')
         parser.add_argument('fname') 
@@ -235,7 +238,7 @@ def gen_case(args, force_func, val_func):
     systems = [system(x,fname, 1,N_IND, [cost_mass, cost_stress], 
         [const_beta, const_mass], force = force_packs[x]) for x in range(len(force_packs))]
 
-    all_front = optimize_systems(systems, N_GEN)
+    all_front = optimize_systems(systems, N_GEN, converged_func = args.conv_func)
     val_func_closed = lambda x: val_func(x, starting_force, fname, MAX_WT, MAX_STRESS)
     if (args.csv == False):
         prepare_report_pretty(all_front, val_func_closed, systems)
@@ -412,7 +415,7 @@ def loc_run(args):
     
     systems = [system_unit(1,fname, 1,N_IND,  
                x_force, y_force, sto_force_x, sto_force_y)]
-    all_front = optimize_systems(systems, N_GEN)
+    all_front = optimize_systems(systems, N_GEN, converged_func=args.conv_func)
     val_closed = lambda x: no_validate(x,[],[],[],[])
     if (args.csv == False):
         prepare_report_pretty(all_front, val_closed, systems)
@@ -420,6 +423,13 @@ def loc_run(args):
         prepare_report_csv(all_front, val_closed, systems)
 def main():
     args = parseargs()
+    if args.convergence:
+        conv_funcs = {
+                1: converge_check_pareto_percentage
+                }
+        args.conv_func  = conv_funcs[args.convergence]
+    else:
+        args.conv_func = lambda a,b,c,d:False
     if args.special:
         cases = {
                 1: det_run,
