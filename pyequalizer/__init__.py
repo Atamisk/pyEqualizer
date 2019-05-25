@@ -275,6 +275,8 @@ def optimize_systems(systems, N_GEN, compact=False):
         latest_vec = main_sys.first_generation()
         for i in range(N_GEN):
             latest_vec = gen_loop(x,i,latest_vec)
+            # TODO: Need to check for convergence in the system, probably here. 
+            # Things the function will need: Current front, last front, current population and current generation number
         #Plot results of this system
         front = isolate_pareto(latest_vec)
         fig , ax = plot_with_front(latest_vec, front, 'System {}'.format(str(x)) 
