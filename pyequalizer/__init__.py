@@ -57,7 +57,7 @@ def const_mass(files):
     return(ms_out)
 
 def converge_check_pareto_percentage(latest_front, last_front, latest_vec, i):
-    threshold = 0.3
+    threshold = 0.5
     percentage = len(latest_front)/len(latest_vec)
     print("CONVERGENCE PROGRESS: Threshold: {} Current: {}".format(threshold, percentage))
     return True if percentage > threshold else False
