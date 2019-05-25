@@ -56,6 +56,10 @@ def const_mass(files):
     ms_out = [min(1000 - x, 0) * -10**4 for x in masses]
     return(ms_out)
 
+def converge_check_pareto_percentage(latest_front, last_front, latest_vec, i):
+    threshold = 0.3
+    return True if len(latest_front)/len(latest_vec) > threshold else False
+
 def uniform_random_force(base_forces, n):
     pre = msslhs.sample(len(base_forces)*2, n, 1)[0].transpose().tolist()
     lhs_exp = make_linear_map(0,104000)
@@ -238,7 +242,7 @@ def gen_case(args, force_func, val_func):
     else:
         prepare_report_csv(all_front, val_func_closed, systems)
 
-def optimize_systems(systems, N_GEN, compact=False):
+def optimize_systems(systems, N_GEN, compact=False, converged_func= lambda a,b,c,d: False):
     """
     Main optimization loop for the program. 
     Inputs:
@@ -273,12 +277,17 @@ def optimize_systems(systems, N_GEN, compact=False):
     for x in range(len(systems)):
         main_sys = systems[x]
         latest_vec = main_sys.first_generation()
+        last_front = []
+        latest_front = isolate_pareto(latest_vec)
         for i in range(N_GEN):
+            last_front = latest_front
             latest_vec = gen_loop(x,i,latest_vec)
-            # TODO: Need to check for convergence in the system, probably here. 
-            # Things the function will need: Current front, last front, current population and current generation number
+            latest_front = isolate_pareto(latest_vec)
+            if converged_func(latest_front, last_front, latest_vec, i):
+                print("Convergence Achieved")
+                break
         #Plot results of this system
-        front = isolate_pareto(latest_vec)
+        front = latest_front
         fig , ax = plot_with_front(latest_vec, front, 'System {}'.format(str(x)) 
                 ,'/tmp/output_sys_' + str(x) + '.png')
         with open('/tmp/output_sys_' + str(x) + '.pickle', 'wb') as f:
