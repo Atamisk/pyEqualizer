@@ -43,6 +43,10 @@ class Ind(object):
         out += "Cost:\n{}".format(self.fitness)
         out = out + "\n\n"
         return str(out)
+    def __eq__(self, other):
+        return [self.props[x][3] == other.props[x][3] for x in range(len(self.props))]
+    def __hash__(self):
+        return hash(tuple(self.props[x][3] for x in range(len(self.props))))
 
 def make_linear_map(low_limit, high_limit):
     """

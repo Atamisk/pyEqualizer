@@ -60,7 +60,29 @@ def converge_check_pareto_percentage(latest_front, last_front, latest_vec, i):
     threshold = 0.5
     percentage = len(latest_front)/len(latest_vec)
     print("CONVERGENCE PROGRESS: Threshold: {} Current: {}".format(threshold, percentage))
-    return True if percentage > threshold else False
+    converged = True if percentage >= threshold else False
+    return [converged, i]
+
+def converge_check_change_percentage(latest_front, last_front, latest_vec, ctr):
+    threshold = 0.9
+    counter_threshold = 10
+    def intersection(lst1, lst2): 
+        # Use of hybrid method 
+        temp = set(lst2) 
+        lst3 = [value for value in lst1 if value in temp] 
+        return lst3 
+    similarity = len(intersection(latest_front, last_front))
+    sim_ratio = similarity/(len(latest_front)/2 + len(last_front) /2)
+    print("CONVERGENCE PROGRESS: Threshold: {} Current: {}".format(threshold, sim_ratio))
+    if sim_ratio >= threshold:
+        if ctr >= counter_threshold:
+            return [True, 0]
+        else: 
+            print("                      Over Threshold for {} generations.".format(ctr + 1))
+            return [False, ctr + 1]
+    else: 
+        return [False, 0]
+
 
 def uniform_random_force(base_forces, n):
     pre = msslhs.sample(len(base_forces)*2, n, 1)[0].transpose().tolist()
@@ -282,11 +304,13 @@ def optimize_systems(systems, N_GEN, compact=False, converged_func= lambda a,b,c
         latest_vec = main_sys.first_generation()
         last_front = []
         latest_front = isolate_pareto(latest_vec)
+        ctr = 0
         for i in range(N_GEN):
             last_front = latest_front
             latest_vec = gen_loop(x,i,latest_vec)
             latest_front = isolate_pareto(latest_vec)
-            if converged_func(latest_front, last_front, latest_vec, i):
+            converged, ctr = converged_func(latest_front, last_front, latest_vec, ctr)
+            if converged:
                 print("Convergence Achieved")
                 break
         #Plot results of this system
@@ -425,7 +449,8 @@ def main():
     args = parseargs()
     if args.convergence:
         conv_funcs = {
-                1: converge_check_pareto_percentage
+                1: converge_check_pareto_percentage,
+                2: converge_check_change_percentage
                 }
         args.conv_func  = conv_funcs[args.convergence]
     else:
